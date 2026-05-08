@@ -1,0 +1,8 @@
+node_modules/
+.env
+*.log
+.wrangler/
+dist/
+.bootstrap-complete
+package-lock.json
+bun.lock
