@@ -18,53 +18,53 @@
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-10 lg:py-12 flex justify-center w-full">
     <div id="env-light" class="fixed inset-0 pointer-events-none bg-gradient-to-br from-white/5 via-transparent to-black/20 mix-blend-overlay z-50"></div>
     <div class="relative flex justify-center perspective-1000">
-      <div id="gameboy-shell" class="relative w-[576px] h-[1050px] rounded-[75px] flex flex-col items-center p-12 overflow-visible">
-        <div class="plastic-grain absolute inset-0 rounded-[75px]"></div>
+      <div id="gameboy-shell" class="relative w-[634px] h-[1155px] rounded-[82px] flex flex-col items-center p-14 overflow-visible">
+        <div class="plastic-grain absolute inset-0 rounded-[82px]"></div>
         
         <!-- Physical Screws -->
-        <div class="screw-hole top-8 left-8"></div>
-        <div class="screw-hole top-8 right-8"></div>
-        <div class="screw-hole bottom-8 left-8"></div>
-        <div class="screw-hole bottom-8 right-8"></div>
+        <div class="screw-hole top-9 left-9"></div>
+        <div class="screw-hole top-9 right-9"></div>
+        <div class="screw-hole bottom-9 left-9"></div>
+        <div class="screw-hole bottom-9 right-9"></div>
 
-        <div class="internal-pcb absolute inset-3 rounded-[72px] opacity-70 pointer-events-none overflow-hidden">
+        <div class="internal-pcb absolute inset-4 rounded-[78px] opacity-70 pointer-events-none overflow-hidden">
           <div class="pcb-traces"></div>
-          <div class="capacitor top-18 left-18"></div>
-          <div class="capacitor top-72 right-20"></div>
-          <div class="cpu-chip top-[55%] left-1/2 -translate-x-1/2 -translate-y-1/2 scale-150"></div>
-          <div class="battery-contacts bottom-18 left-1/2 -translate-x-1/2 scale-150"></div>
+          <div class="capacitor top-20 left-20"></div>
+          <div class="capacitor top-80 right-22"></div>
+          <div class="cpu-chip top-[55%] left-1/2 -translate-x-1/2 -translate-y-1/2 scale-[1.65]"></div>
+          <div class="battery-contacts bottom-20 left-1/2 -translate-x-1/2 scale-[1.65]"></div>
         </div>
 
-        <div class="relative w-full aspect-[10/9] bg-[#1a1a1e] rounded-t-3xl rounded-b-[90px] p-9 shadow-[inset_0_0_45px_black] border-[24px] border-zinc-900 overflow-hidden z-20">
-          <div class="absolute top-2 left-1/2 -translate-x-1/2 text-[8px] text-zinc-600 font-mono tracking-[4px] uppercase opacity-40">PHANTOM_CORE_INTERFACE</div>
+        <div class="relative w-full aspect-[10/9] bg-[#1a1a1e] rounded-t-3xl rounded-b-[100px] p-10 shadow-[inset_0_0_50px_black] border-[26px] border-zinc-900 overflow-hidden z-20">
+          <div class="absolute top-3 left-1/2 -translate-x-1/2 text-[9px] text-zinc-600 font-mono tracking-[4.5px] uppercase opacity-40">PHANTOM_CORE_INTERFACE</div>
           
           <div id="bezel-glow" class="absolute inset-0 pointer-events-none opacity-0 z-10"></div>
           <div id="screen-wrapper" class="w-full h-full relative overflow-hidden bg-[#040a04]">
             <canvas id="screen-canvas" class="absolute inset-0 z-30 pointer-events-none opacity-30 mix-blend-overlay"></canvas>
             <div id="screen" class="w-full h-full bg-[#050c05] overflow-hidden relative z-20">
-              <div id="game-view" class="w-full h-full p-6 flex flex-col items-center justify-center">
-                <div class="text-[15px] animate-pulse text-[#0f380f]">INIT_PHYS_ENGINE...</div>
+              <div id="game-view" class="w-full h-full p-7 flex flex-col items-center justify-center">
+                <div class="text-[18px] animate-pulse text-[#0f380f]">INIT_PHYS_ENGINE...</div>
               </div>
             </div>
             <div id="glass-reflection" class="absolute inset-0 z-40 pointer-events-none"></div>
             <div class="scanlines absolute inset-0 z-25 opacity-20 pointer-events-none"></div>
             <div class="micro-pixel-grid absolute inset-0 z-28 pointer-events-none opacity-10"></div>
           </div>
-          <div class="flex justify-between mt-6 px-2 items-center relative z-50">
-            <span class="text-[9px] text-zinc-500 font-bold uppercase tracking-[0.25em]">DOT MATRIX OS / GENESIS</span>
-            <div class="flex items-center gap-2">
-               <div class="w-4 h-4 rounded-sm bg-zinc-800 flex items-center justify-center border border-white/5 relative">
-                  <div id="power-led" class="w-2.5 h-2.5 rounded-full bg-red-950 transition-all duration-300"></div>
+          <div class="flex justify-between mt-7 px-2 items-center relative z-50">
+            <span class="text-[10px] text-zinc-500 font-bold uppercase tracking-[0.25em]">DOT MATRIX OS / GENESIS</span>
+            <div class="flex items-center gap-2.5">
+               <div class="w-5 h-5 rounded-sm bg-zinc-800 flex items-center justify-center border border-white/5 relative">
+                  <div id="power-led" class="w-3 h-3 rounded-full bg-red-950 transition-all duration-300"></div>
                   <div id="led-glow" class="absolute pointer-events-none"></div>
                </div>
             </div>
           </div>
         </div>
 
-        <div class="w-full flex-1 flex flex-col justify-between mt-20 relative z-20">
-          <div class="flex justify-between items-start px-3">
-            <div class="relative w-48 h-48 rounded-full bg-black/40 shadow-[inset_0_8px_18px_rgba(0,0,0,0.8)] flex items-center justify-center">
-              <div id="dpad-container" class="relative w-36 h-36 transition-transform duration-100">
+        <div class="w-full flex-1 flex flex-col justify-between mt-22 relative z-20">
+          <div class="flex justify-between items-start px-4">
+            <div class="relative w-52 h-52 rounded-full bg-black/40 shadow-[inset_0_9px_20px_rgba(0,0,0,0.8)] flex items-center justify-center">
+              <div id="dpad-container" class="relative w-40 h-40 transition-transform duration-100">
                 <div class="absolute inset-[33%] bg-zinc-800 z-10 shadow-2xl"></div>
                 <button id="btn-up" aria-label="Up" class="left-[35%] top-0 w-[30%] h-[35%] rounded-t-md"></button>
                 <button id="btn-down" aria-label="Down" class="left-[35%] bottom-0 w-[30%] h-[35%] rounded-b-md"></button>
@@ -73,20 +73,20 @@
               </div>
             </div>
             
-            <div class="flex gap-12 mt-20 -rotate-12">
+            <div class="flex gap-14 mt-22 -rotate-12">
               <div class="flex flex-col items-center">
-                <button id="btn-b" aria-label="Button B" class="scale-150 flex items-center justify-center text-white/20 font-bold text-[14px] pt-1">B</button>
-                <span class="text-[15px] text-purple-200/40 font-bold mt-4">B</span>
+                <button id="btn-b" aria-label="Button B" class="scale-[1.65] flex items-center justify-center text-white/20 font-bold text-[14px] pt-1">B</button>
+                <span class="text-[16px] text-purple-200/40 font-bold mt-5">B</span>
               </div>
               <div class="flex flex-col items-center">
-                <button id="btn-a" aria-label="Button A" class="scale-150 flex items-center justify-center text-white/20 font-bold text-[14px] pt-1">A</button>
-                <span class="text-[15px] text-purple-200/40 font-bold mt-4">A</span>
+                <button id="btn-a" aria-label="Button A" class="scale-[1.65] flex items-center justify-center text-white/20 font-bold text-[14px] pt-1">A</button>
+                <span class="text-[16px] text-purple-200/40 font-bold mt-5">A</span>
               </div>
             </div>
           </div>
 
           <!-- Speaker Grille -->
-          <div class="speaker-grille absolute bottom-12 right-12 opacity-40">
+          <div class="speaker-grille absolute bottom-14 right-14 opacity-40">
             <div class="speaker-slit"></div>
             <div class="speaker-slit"></div>
             <div class="speaker-slit"></div>
@@ -95,14 +95,14 @@
             <div class="speaker-slit"></div>
           </div>
 
-          <div class="flex justify-center gap-24 mb-16 -rotate-[20deg]">
+          <div class="flex justify-center gap-28 mb-18 -rotate-[20deg]">
             <div class="flex flex-col items-center">
-              <button id="btn-select" aria-label="Select" class="scale-150"></button>
-              <span class="text-[12px] text-purple-200/30 font-bold mt-4 uppercase tracking-tight">Select</span>
+              <button id="btn-select" aria-label="Select" class="scale-[1.65]"></button>
+              <span class="text-[13px] text-purple-200/30 font-bold mt-5 uppercase tracking-tight">Select</span>
             </div>
             <div class="flex flex-col items-center">
-              <button id="btn-start" aria-label="Start" class="scale-150"></button>
-              <span class="text-[12px] text-purple-200/30 font-bold mt-4 uppercase tracking-tight">Start</span>
+              <button id="btn-start" aria-label="Start" class="scale-[1.65]"></button>
+              <span class="text-[13px] text-purple-200/30 font-bold mt-5 uppercase tracking-tight">Start</span>
             </div>
           </div>
         </div>

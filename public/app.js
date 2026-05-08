@@ -514,7 +514,7 @@ class EphantomOS {
         <div class="cinematic-text ${item.font} font-bold tracking-tight leading-tight drop-shadow-lg" style="font-size: ${item.size}">
           ${item.text}
         </div>
-        <div class="absolute bottom-4 text-[6px] font-retro opacity-20 fade-in">[B] SKIP INTRO</div>
+        <div class="absolute bottom-4 text-[10px] font-retro opacity-20 fade-in">[B] SKIP INTRO</div>
       </div>`
   }
 
@@ -522,7 +522,7 @@ class EphantomOS {
     this.viewContainer.innerHTML = `
       <div class="flex flex-col items-center justify-center h-full text-[#040a04] p-3 text-center">
         <div class="text-[24px] font-heading tracking-tight leading-none mb-3 drop-shadow-lg">EPHANTOM</div>
-        <div class="text-[8px] font-tech leading-tight opacity-95 mb-4 px-1 max-w-[90%] font-bold">
+        <div class="text-[10px] font-tech leading-tight opacity-95 mb-4 px-1 max-w-[90%] font-bold">
           DECENTRALIZED AUTONOMOUS MUSIC LABEL
         </div>
         <div class="text-[7px] font-mono opacity-80 mb-4 border-y border-[#040a04]/20 py-2 px-1">
@@ -532,7 +532,7 @@ class EphantomOS {
           "Doing more and more with less and less until we can do everything with nothing"
         </div>
         <div class="mt-4 animate-pulse bg-[#040a04] text-[#8bac0f] px-4 py-2 text-[10px] border-2 border-[#fff] font-retro">PRESS START</div>
-        <div class="mt-4 text-[6px] font-retro opacity-30 tracking-widest flex flex-col gap-1">
+        <div class="mt-4 text-[10px] font-retro opacity-30 tracking-widest flex flex-col gap-1">
            <span>DAO_ROSTER: @zalgorythms</span>
            <span>ESTD. 2026</span>
         </div>
@@ -553,11 +553,11 @@ class EphantomOS {
           ${this.menuOptions.map((opt, i) => `
             <div class="px-2 py-1 text-[10px] font-heading flex justify-between items-center ${this.menuIndex === i ? 'selected' : ''}">
               <span>${opt}</span>
-              ${this.menuIndex === i ? '<span class="text-[6px]">▶</span>' : ''}
+              ${this.menuIndex === i ? '<span class="text-[10px]">▶</span>' : ''}
             </div>
           `).join('')}
         </div>
-        <div class="mt-3 text-[6px] font-retro opacity-40 flex justify-between border-t border-[#040a04]/10 pt-2">
+        <div class="mt-3 text-[10px] font-retro opacity-40 flex justify-between border-t border-[#040a04]/10 pt-2">
           <span>BATT:${this.batteryLevel}%</span>
           <span>REP:${this.vault ? this.vault.reputation : '...'}</span>
         </div>
@@ -589,8 +589,8 @@ class EphantomOS {
     if (!trk) {
       this.viewContainer.innerHTML = `
         <div class="w-full h-full p-2 flex flex-col items-center justify-center text-[#040a04] font-tech">
-          <div class="text-[8px] opacity-40 mb-2">THE MATRIX</div>
-          <div class="text-[8px] animate-pulse">NO_ACTIVE_TRACKS</div>
+          <div class="text-[10px] opacity-40 mb-2">THE MATRIX</div>
+          <div class="text-[10px] animate-pulse">NO_ACTIVE_TRACKS</div>
         </div>`
       return
     }
@@ -599,7 +599,7 @@ class EphantomOS {
 
     this.viewContainer.innerHTML = `
       <div class="w-full h-full p-2 flex flex-col text-[#040a04] relative font-tech">
-        <div class="text-[6px] font-retro border-b border-[#040a04] pb-1 mb-2 flex justify-between">
+        <div class="text-[10px] font-retro border-b border-[#040a04] pb-1 mb-2 flex justify-between">
           <span>CYC#${cycle.id} · ${cycle.phase}</span>
           <span>${timeStr}</span>
         </div>
@@ -615,7 +615,7 @@ class EphantomOS {
         <div class="matrix-card flex-1 flex flex-col p-2 bg-[#040a04]/5 relative">
           <div class="text-[7px] font-retro opacity-50 mb-1">ARTIFAC [${this.matrixIndex+1}/${total}]</div>
           <div class="text-[12px] font-heading leading-tight mb-2">${trk.title}</div>
-          <div class="text-[8px] font-mono opacity-60">${trk.ii_name}</div>
+          <div class="text-[10px] font-mono opacity-60">${trk.ii_name}</div>
           <div class="flex gap-2 mt-2 text-[7px] font-retro">
             <span class="bg-[#040a04]/10 px-1">${trk.genre}</span>
             <span>${trk.bpm}BPM</span>
@@ -625,7 +625,7 @@ class EphantomOS {
             <span>▲${trk.votes} · ⚖${(trk.rep_weight||0).toLocaleString()}</span>
           </div>
         </div>
-        <div class="mt-2 text-[6px] font-retro flex justify-between items-center">
+        <div class="mt-2 text-[10px] font-retro flex justify-between items-center">
           ${hasVoted ? '<span class="text-[#0f380f]">✓ VOTE_CAST</span>' : '<span class="animate-pulse">[A] VOTE</span>'}
           <span class="opacity-40">LEAD: ${leadTrk.title.slice(0,8)}</span>
         </div>
@@ -639,14 +639,14 @@ class EphantomOS {
     const ii   = ents[this.forgeIIIndex] || ents[0]
 
     if (this.forgeStep === 'LOADING') {
-      this.viewContainer.innerHTML = `<div class="w-full h-full p-2 flex flex-col text-[#040a04] font-tech"><div class="text-[6px] font-retro border-b border-[#040a04] mb-3 pb-1">FORGE_CONSOLE</div><div class="flex-1 flex flex-col justify-center items-center gap-2"><div class="text-[10px] font-heading animate-pulse">SYNTHESIZING...</div><div class="text-[7px] opacity-60">${ii.name}</div><div class="h-1.5 w-full bg-[#040a04]/10 mt-2"><div class="h-full bg-[#040a04] animate-pulse" style="width:66%"></div></div></div></div>`
+      this.viewContainer.innerHTML = `<div class="w-full h-full p-2 flex flex-col text-[#040a04] font-tech"><div class="text-[10px] font-retro border-b border-[#040a04] mb-3 pb-1">FORGE_CONSOLE</div><div class="flex-1 flex flex-col justify-center items-center gap-2"><div class="text-[10px] font-heading animate-pulse">SYNTHESIZING...</div><div class="text-[7px] opacity-60">${ii.name}</div><div class="h-1.5 w-full bg-[#040a04]/10 mt-2"><div class="h-full bg-[#040a04] animate-pulse" style="width:66%"></div></div></div></div>`
       return
     }
 
     if (this.forgeStep === 4 && this.forgeResult) {
       const ok = this.forgeResult.ok
       const trk = this.forgeResult.track
-      this.viewContainer.innerHTML = `<div class="w-full h-full p-2 flex flex-col text-[#040a04] font-tech"><div class="text-[6px] font-retro border-b border-[#040a04] mb-2 pb-1">FORGE_RESULT</div><div class="flex-1 flex flex-col justify-center items-center text-center gap-2">${ok ? `<div class="text-[20px] font-heading">⬡</div><div class="text-[8px] font-bold">TRACK SUBMITTED</div><div class="text-[10px] font-mono mt-1">${trk?.title}</div><div class="text-[7px] opacity-60 mt-1">${trk?.ii_name} · ${trk?.bpm}BPM</div>` : `<div class="text-[20px] font-heading">✗</div><div class="text-[8px] font-bold">${this.forgeResult.error || 'ERROR'}</div>`}</div><div class="text-[6px] font-retro text-center animate-pulse mt-2">[A/B] CONTINUE</div></div>`
+      this.viewContainer.innerHTML = `<div class="w-full h-full p-2 flex flex-col text-[#040a04] font-tech"><div class="text-[10px] font-retro border-b border-[#040a04] mb-2 pb-1">FORGE_RESULT</div><div class="flex-1 flex flex-col justify-center items-center text-center gap-2">${ok ? `<div class="text-[20px] font-heading">⬡</div><div class="text-[10px] font-bold">TRACK SUBMITTED</div><div class="text-[10px] font-mono mt-1">${trk?.title}</div><div class="text-[7px] opacity-60 mt-1">${trk?.ii_name} · ${trk?.bpm}BPM</div>` : `<div class="text-[20px] font-heading">✗</div><div class="text-[10px] font-bold">${this.forgeResult.error || 'ERROR'}</div>`}</div><div class="text-[10px] font-retro text-center animate-pulse mt-2">[A/B] CONTINUE</div></div>`
       return
     }
 
@@ -657,45 +657,45 @@ class EphantomOS {
 
     switch (stepNum) {
       case 0:
-        stepBody = `<div class="text-[7px] font-retro opacity-50 mb-2">◀ [L/R] BROWSE · [A] SELECT ▶</div><div class="matrix-card p-2 flex flex-col bg-[#040a04]/5 flex-1"><div class="text-[6px] font-mono opacity-60">${ii.id}</div><div class="text-[12px] font-heading mt-1">${ii.name}</div>${ii.video ? `<div class="w-full aspect-[16/9] bg-[#040a04]/20 my-2 overflow-hidden border border-[#040a04]/40 relative pointer-events-none shadow-inner"><video src="${ii.video}" autoplay loop muted playsinline class="absolute inset-0 w-full h-full object-cover opacity-100"></video></div>` : ''}<div class="text-[8px] mt-1 font-tech leading-tight">${ii.genre_cluster}</div><div class="text-[7px] mt-2 font-mono opacity-60">${ii.lyrical_seeds.join(' · ')}</div><div class="mt-auto text-[6px] font-retro flex justify-between opacity-50"><span>${ii.releases} REL</span><span>${ii.active_curators} CUR</span><span class="${ii.status === 'ACTIVE' ? '' : 'animate-pulse'}">${ii.status}</span></div></div>`
+        stepBody = `<div class="text-[7px] font-retro opacity-50 mb-2">◀ [L/R] BROWSE · [A] SELECT ▶</div><div class="matrix-card p-2 flex flex-col bg-[#040a04]/5 flex-1"><div class="text-[10px] font-mono opacity-60">${ii.id}</div><div class="text-[12px] font-heading mt-1">${ii.name}</div>${ii.video ? `<div class="w-full aspect-[16/9] bg-[#040a04]/20 my-2 overflow-hidden border border-[#040a04]/40 relative pointer-events-none shadow-inner"><video src="${ii.video}" autoplay loop muted playsinline class="absolute inset-0 w-full h-full object-cover opacity-100"></video></div>` : ''}<div class="text-[10px] mt-1 font-tech leading-tight">${ii.genre_cluster}</div><div class="text-[7px] mt-2 font-mono opacity-60">${ii.lyrical_seeds.join(' · ')}</div><div class="mt-auto text-[10px] font-retro flex justify-between opacity-50"><span>${ii.releases} REL</span><span>${ii.active_curators} CUR</span><span class="${ii.status === 'ACTIVE' ? '' : 'animate-pulse'}">${ii.status}</span></div></div>`
         break
       case 1:
-        stepBody = `<div class="text-[7px] font-retro opacity-50 mb-2">▲▼ ADJUST · [A] CONFIRM</div><div class="flex-1 flex flex-col items-center justify-center"><div class="text-[8px] font-mono opacity-60">${ii.name}</div><div class="text-[32px] font-heading mt-2">${this.forgeBPM}</div><div class="text-[8px] font-retro mt-1">BPM</div><div class="h-2 w-full bg-[#040a04]/10 mt-4 border border-[#040a04]/20"><div class="h-full bg-[#040a04]" style="width:${Math.round((this.forgeBPM - ii.bpm_range[0]) / (ii.bpm_range[1] - ii.bpm_range[0]) * 100)}%"></div></div></div>`
+        stepBody = `<div class="text-[7px] font-retro opacity-50 mb-2">▲▼ ADJUST · [A] CONFIRM</div><div class="flex-1 flex flex-col items-center justify-center"><div class="text-[10px] font-mono opacity-60">${ii.name}</div><div class="text-[32px] font-heading mt-2">${this.forgeBPM}</div><div class="text-[10px] font-retro mt-1">BPM</div><div class="h-2 w-full bg-[#040a04]/10 mt-4 border border-[#040a04]/20"><div class="h-full bg-[#040a04]" style="width:${Math.round((this.forgeBPM - ii.bpm_range[0]) / (ii.bpm_range[1] - ii.bpm_range[0]) * 100)}%"></div></div></div>`
         break
       case 2:
-        stepBody = `<div class="text-[7px] font-retro opacity-50 mb-2">▲▼ SCROLL · [A] CONFIRM</div><div class="flex-1 flex flex-col justify-center"><div class="text-[8px] font-tech opacity-30 text-center py-1">${this.forgeGenres[(this.forgeGenreIndex - 1 + this.forgeGenres.length) % this.forgeGenres.length]}</div><div class="text-[12px] font-heading text-center py-2 border-y border-[#040a04] my-2">${this.forgeGenres[this.forgeGenreIndex]}</div><div class="text-[8px] font-tech opacity-30 text-center py-1">${this.forgeGenres[(this.forgeGenreIndex + 1) % this.forgeGenres.length]}</div></div>`
+        stepBody = `<div class="text-[7px] font-retro opacity-50 mb-2">▲▼ SCROLL · [A] CONFIRM</div><div class="flex-1 flex flex-col justify-center"><div class="text-[10px] font-tech opacity-30 text-center py-1">${this.forgeGenres[(this.forgeGenreIndex - 1 + this.forgeGenres.length) % this.forgeGenres.length]}</div><div class="text-[12px] font-heading text-center py-2 border-y border-[#040a04] my-2">${this.forgeGenres[this.forgeGenreIndex]}</div><div class="text-[10px] font-tech opacity-30 text-center py-1">${this.forgeGenres[(this.forgeGenreIndex + 1) % this.forgeGenres.length]}</div></div>`
         break
       case 3:
-        stepBody = `<div class="text-[7px] font-retro opacity-50 mb-2">[A] SUBMIT · [B] BACK</div><div class="matrix-card p-2 flex-1 bg-[#040a04]/5 font-mono"><div class="text-[8px] font-heading mb-3 border-b border-[#040a04]/20 pb-1">MANIFEST</div><div class="space-y-1.5 text-[8px]"><div class="flex justify-between"><span class="opacity-60">TARGET</span><span>${ii.name}</span></div><div class="flex justify-between"><span class="opacity-60">BPM</span><span>${this.forgeBPM}</span></div><div class="flex justify-between"><span class="opacity-60">GENRE</span><span>${this.forgeGenres[this.forgeGenreIndex]}</span></div><div class="flex justify-between"><span class="opacity-60">CYCLE</span><span>#${this.cycle?.id || 1}</span></div></div><div class="text-[7px] opacity-40 mt-4 font-tech italic">40% ARCHITECT ROYALTY IF SELECTED</div></div>`
+        stepBody = `<div class="text-[7px] font-retro opacity-50 mb-2">[A] SUBMIT · [B] BACK</div><div class="matrix-card p-2 flex-1 bg-[#040a04]/5 font-mono"><div class="text-[10px] font-heading mb-3 border-b border-[#040a04]/20 pb-1">MANIFEST</div><div class="space-y-1.5 text-[10px]"><div class="flex justify-between"><span class="opacity-60">TARGET</span><span>${ii.name}</span></div><div class="flex justify-between"><span class="opacity-60">BPM</span><span>${this.forgeBPM}</span></div><div class="flex justify-between"><span class="opacity-60">GENRE</span><span>${this.forgeGenres[this.forgeGenreIndex]}</span></div><div class="flex justify-between"><span class="opacity-60">CYCLE</span><span>#${this.cycle?.id || 1}</span></div></div><div class="text-[7px] opacity-40 mt-4 font-tech italic">40% ARCHITECT ROYALTY IF SELECTED</div></div>`
         break
     }
 
-    this.viewContainer.innerHTML = `<div class="w-full h-full p-2 flex flex-col text-[#040a04] font-tech"><div class="text-[6px] font-retro border-b border-[#040a04] pb-1 mb-2 flex justify-between"><span>THE_FORGE</span><span>${stepNum+1}/4</span></div><div class="text-[8px] font-heading mb-2 opacity-70">${stepLabel}</div><div class="flex-1 flex flex-col">${stepBody}</div></div>`
+    this.viewContainer.innerHTML = `<div class="w-full h-full p-2 flex flex-col text-[#040a04] font-tech"><div class="text-[10px] font-retro border-b border-[#040a04] pb-1 mb-2 flex justify-between"><span>THE_FORGE</span><span>${stepNum+1}/4</span></div><div class="text-[10px] font-heading mb-2 opacity-70">${stepLabel}</div><div class="flex-1 flex flex-col">${stepBody}</div></div>`
   }
 
   _renderRoster() {
     const ents = this.entities.length ? this.entities : this._stubEntities()
     const ent  = ents[this.rosterIndex] || ents[0]
-    this.viewContainer.innerHTML = `<div class="w-full h-full p-2 flex flex-col text-[#040a04] font-tech"><div class="text-[6px] font-retro border-b border-[#040a04] pb-1 mb-2 flex justify-between"><span>II_REGISTRY</span><span>[${this.rosterIndex+1}/${ents.length}]</span></div><div class="matrix-card p-2 flex-1 flex flex-col bg-[#040a04]/5"><div class="flex justify-between items-start mb-1"><div><div class="text-[6px] font-mono opacity-50">${ent.id}</div><div class="text-[12px] font-heading mt-1">${ent.name}</div></div><div class="text-[6px] font-retro text-right ${ent.status === 'ACTIVE' ? '' : 'animate-pulse'}">${ent.status}</div></div>${ent.video ? `<div class="w-full aspect-[16/9] bg-[#040a04]/20 mb-2 overflow-hidden border border-[#040a04]/40 relative pointer-events-none shadow-inner"><video src="${ent.video}" autoplay loop muted playsinline class="absolute inset-0 w-full h-full object-cover opacity-100"></video></div>` : ''}<div class="text-[8px] mt-1 font-tech leading-tight opacity-80">${ent.genre_cluster}</div><div class="mt-2 flex gap-1 flex-wrap">${(ent.lyrical_seeds||[]).map(s => `<span class="bg-[#040a04] text-[#8bac0f] px-1 py-px text-[6px] font-retro border border-white/20">${s}</span>`).join('')}</div><div class="mt-auto space-y-1 font-mono text-[7px]"><div class="flex justify-between"><span class="opacity-60">RELEASES</span><span>${ent.releases}</span></div><div class="flex justify-between"><span class="opacity-60">CURATORS</span><span>${ent.active_curators}</span></div></div></div></div>`
+    this.viewContainer.innerHTML = `<div class="w-full h-full p-2 flex flex-col text-[#040a04] font-tech"><div class="text-[10px] font-retro border-b border-[#040a04] pb-1 mb-2 flex justify-between"><span>II_REGISTRY</span><span>[${this.rosterIndex+1}/${ents.length}]</span></div><div class="matrix-card p-2 flex-1 flex flex-col bg-[#040a04]/5"><div class="flex justify-between items-start mb-1"><div><div class="text-[10px] font-mono opacity-50">${ent.id}</div><div class="text-[12px] font-heading mt-1">${ent.name}</div></div><div class="text-[10px] font-retro text-right ${ent.status === 'ACTIVE' ? '' : 'animate-pulse'}">${ent.status}</div></div>${ent.video ? `<div class="w-full aspect-[16/9] bg-[#040a04]/20 mb-2 overflow-hidden border border-[#040a04]/40 relative pointer-events-none shadow-inner"><video src="${ent.video}" autoplay loop muted playsinline class="absolute inset-0 w-full h-full object-cover opacity-100"></video></div>` : ''}<div class="text-[10px] mt-1 font-tech leading-tight opacity-80">${ent.genre_cluster}</div><div class="mt-2 flex gap-1 flex-wrap">${(ent.lyrical_seeds||[]).map(s => `<span class="bg-[#040a04] text-[#8bac0f] px-1 py-px text-[10px] font-retro border border-white/20">${s}</span>`).join('')}</div><div class="mt-auto space-y-1 font-mono text-[7px]"><div class="flex justify-between"><span class="opacity-60">RELEASES</span><span>${ent.releases}</span></div><div class="flex justify-between"><span class="opacity-60">CURATORS</span><span>${ent.active_curators}</span></div></div></div></div>`
   }
 
   _renderDaoRoster() {
     this.viewContainer.innerHTML = `
       <div class="w-full h-full p-2 flex flex-col text-[#040a04] font-tech">
-        <div class="text-[6px] font-retro border-b border-[#040a04] pb-1 mb-2 flex justify-between">
+        <div class="text-[10px] font-retro border-b border-[#040a04] pb-1 mb-2 flex justify-between">
           <span>DAO_MEMBERS</span>
           <span>[LIVE]</span>
         </div>
         <div class="flex-1 flex flex-col gap-3 mt-2">
           <div class="matrix-card p-2 bg-[#040a04]/10 border border-[#040a04]/30">
-            <div class="text-[6px] font-retro opacity-50 mb-1 uppercase">Founder</div>
+            <div class="text-[10px] font-retro opacity-50 mb-1 uppercase">Founder</div>
             <div class="text-[11px] font-heading">@zalgorythms</div>
-            <div class="text-[8px] font-mono mt-1 opacity-70">REPUTATION: 5,000</div>
+            <div class="text-[10px] font-mono mt-1 opacity-70">REPUTATION: 5,000</div>
           </div>
           <div class="matrix-card p-2 border border-[#040a04]/30 bg-[#040a04]/5">
-            <div class="text-[6px] font-retro opacity-50 mb-1 uppercase">Active Member</div>
+            <div class="text-[10px] font-retro opacity-50 mb-1 uppercase">Active Member</div>
             <div class="text-[11px] font-heading text-blue-900">@${this.username}</div>
-            <div class="text-[8px] font-mono mt-1 opacity-70">REPUTATION: ${this.vault ? this.vault.reputation : 1000}</div>
+            <div class="text-[10px] font-mono mt-1 opacity-70">REPUTATION: ${this.vault ? this.vault.reputation : 1000}</div>
           </div>
         </div>
         <div class="mt-auto text-[7px] font-tech text-center opacity-50 leading-tight border-t border-[#040a04]/10 pt-2">
@@ -712,34 +712,34 @@ class EphantomOS {
       const pct = Math.min(100, Math.round((v.reputation - v.floor) / (5000 - v.floor) * 100))
       body = `<div class="flex-1 flex flex-col"><div class="bg-[#040a04] text-[#8bac0f] text-center py-4 border-2 border-white/20"><div class="text-[24px] font-heading">${v.reputation.toLocaleString()}</div><div class="text-[7px] font-retro mt-1">@${this.username} REP</div></div><div class="mt-4 space-y-2 text-[9px] font-mono"><div><div class="flex justify-between mb-1"><span class="opacity-60">POWER</span><span>${pct}%</span></div><div class="h-2 w-full bg-[#040a04]/10"><div class="h-full bg-[#040a04]" style="width:${pct}%"></div></div></div><div class="flex justify-between"><span class="opacity-60">ROLE</span><span>${v.role}</span></div><div class="flex justify-between"><span class="opacity-60">WALLET</span><span>${this.wallet ? 'LINKED' : 'NOT_CONNECTED'}</span></div></div></div>`
     } else if (this.vaultPage === 1) {
-      body = `<div class="flex-1 flex flex-col"><div class="bg-[#0f380f] text-[#8bac0f] text-center py-3 border-2 border-white/20 mb-3"><div class="text-[8px] font-retro opacity-70 mb-1">PENDING</div><div class="text-[18px] font-heading">${v.royalties_pending?.toFixed(4)}</div><div class="text-[8px] font-mono mt-1">ETH</div></div><div class="space-y-2 text-[8px] font-mono"><div class="flex justify-between"><span class="opacity-60">LIFETIME</span><span>${v.royalties_lifetime?.toFixed(4)} ETH</span></div><div class="flex justify-between"><span class="opacity-60">SPLIT</span><span>CROWD: 40%</span></div><div class="text-[6px] opacity-40 font-tech mt-4 italic text-center">PAYOUT ON QUORUM + THRESHOLD</div></div></div>`
+      body = `<div class="flex-1 flex flex-col"><div class="bg-[#0f380f] text-[#8bac0f] text-center py-3 border-2 border-white/20 mb-3"><div class="text-[10px] font-retro opacity-70 mb-1">PENDING</div><div class="text-[18px] font-heading">${v.royalties_pending?.toFixed(4)}</div><div class="text-[10px] font-mono mt-1">ETH</div></div><div class="space-y-2 text-[10px] font-mono"><div class="flex justify-between"><span class="opacity-60">LIFETIME</span><span>${v.royalties_lifetime?.toFixed(4)} ETH</span></div><div class="flex justify-between"><span class="opacity-60">SPLIT</span><span>CROWD: 40%</span></div><div class="text-[10px] opacity-40 font-tech mt-4 italic text-center">PAYOUT ON QUORUM + THRESHOLD</div></div></div>`
     } else {
       const hist = (v.alignment_history || []).slice(0, 4)
-      body = `<div class="flex-1 flex flex-col"><div class="text-[8px] font-heading mb-3 opacity-60">HISTORY</div><div class="space-y-2 font-mono">${hist.map(h => `<div class="flex items-center gap-2 text-[8px] border-b border-[#040a04]/10 pb-1"><span class="w-4 opacity-50">#${h.cycle}</span><span class="${h.aligned ? 'text-[#0f380f]' : 'opacity-40'}">${h.aligned ? '✓' : '✗'}</span><span class="flex-1 truncate">${h.track}</span><span class="font-bold">${h.delta > 0 ? '+' : ''}${h.delta}</span></div>`).join('')}</div></div>`
+      body = `<div class="flex-1 flex flex-col"><div class="text-[10px] font-heading mb-3 opacity-60">HISTORY</div><div class="space-y-2 font-mono">${hist.map(h => `<div class="flex items-center gap-2 text-[10px] border-b border-[#040a04]/10 pb-1"><span class="w-4 opacity-50">#${h.cycle}</span><span class="${h.aligned ? 'text-[#0f380f]' : 'opacity-40'}">${h.aligned ? '✓' : '✗'}</span><span class="flex-1 truncate">${h.track}</span><span class="font-bold">${h.delta > 0 ? '+' : ''}${h.delta}</span></div>`).join('')}</div></div>`
     }
-    this.viewContainer.innerHTML = `<div class="w-full h-full p-2 flex flex-col text-[#040a04] font-tech"><div class="text-[6px] font-retro border-b border-[#040a04] pb-1 mb-2 flex justify-between"><span>THE VAULT</span><span>◀ ${pages[this.vaultPage]} ▶</span></div>${body}<div class="mt-auto flex justify-center gap-3 pt-2">${pages.map((_, i) => `<div class="w-2 h-2 rounded-full border border-[#040a04]/20 ${i === this.vaultPage ? 'bg-[#040a04]' : 'bg-transparent'}"></div>`).join('')}</div></div>`
+    this.viewContainer.innerHTML = `<div class="w-full h-full p-2 flex flex-col text-[#040a04] font-tech"><div class="text-[10px] font-retro border-b border-[#040a04] pb-1 mb-2 flex justify-between"><span>THE VAULT</span><span>◀ ${pages[this.vaultPage]} ▶</span></div>${body}<div class="mt-auto flex justify-center gap-3 pt-2">${pages.map((_, i) => `<div class="w-2 h-2 rounded-full border border-[#040a04]/20 ${i === this.vaultPage ? 'bg-[#040a04]' : 'bg-transparent'}"></div>`).join('')}</div></div>`
   }
 
   _renderConnectWallet() {
     const isConnected = !!this.wallet
     this.viewContainer.innerHTML = `
       <div class="w-full h-full p-2 flex flex-col text-[#040a04] font-tech">
-        <div class="text-[6px] font-retro border-b border-[#040a04] pb-1 mb-3 flex justify-between">
+        <div class="text-[10px] font-retro border-b border-[#040a04] pb-1 mb-3 flex justify-between">
           <span>WALLET_BRIDGE</span>
           <span>TON_NET</span>
         </div>
         <div class="flex-1 flex flex-col justify-center items-center text-center">
           ${isConnected ? `
             <div class="text-[14px] font-heading mb-2">CONNECTED</div>
-            <div class="text-[6px] font-mono opacity-60 break-all px-2">${this.wallet.account.address.slice(0,16)}...${this.wallet.account.address.slice(-8)}</div>
-            <div class="mt-4 text-[8px] font-mono">USER: @${this.username}</div>
+            <div class="text-[10px] font-mono opacity-60 break-all px-2">${this.wallet.account.address.slice(0,16)}...${this.wallet.account.address.slice(-8)}</div>
+            <div class="mt-4 text-[10px] font-mono">USER: @${this.username}</div>
           ` : `
             <div class="text-[10px] font-heading mb-2 animate-pulse">AWAITING_CONNECTION</div>
             <div class="text-[7px] mb-4 opacity-70">CONNECT YOUR TELEGRAM WALLET TO SECURE YOUR REPUTATION</div>
-            <div class="bg-[#040a04] text-[#8bac0f] px-3 py-1.5 text-[8px] font-retro border-2 border-white animate-pulse">[A] CONNECT</div>
+            <div class="bg-[#040a04] text-[#8bac0f] px-3 py-1.5 text-[10px] font-retro border-2 border-white animate-pulse">[A] CONNECT</div>
           `}
         </div>
-        <div class="mt-auto text-[6px] opacity-40 italic text-center">REQUIRES TELEGRAM APP</div>
+        <div class="mt-auto text-[10px] opacity-40 italic text-center">REQUIRES TELEGRAM APP</div>
       </div>`
   }
 
@@ -838,15 +838,15 @@ class EphantomOS {
         
         <div class="flex-1 flex flex-col justify-between fade-in">
           <div>
-            <div class="bg-[#040a04] text-[#8bac0f] px-2 py-0.5 text-[6px] font-retro inline-block mb-2 border border-white/20">${s.pill}</div>
+            <div class="bg-[#040a04] text-[#8bac0f] px-2 py-0.5 text-[10px] font-retro inline-block mb-2 border border-white/20">${s.pill}</div>
             <div class="text-[14px] font-heading leading-tight mb-1">${s.title}</div>
-            <div class="text-[8px] font-mono opacity-70 mb-2 italic">"${s.tagline}"</div>
+            <div class="text-[10px] font-mono opacity-70 mb-2 italic">"${s.tagline}"</div>
             <div class="text-[7px] leading-relaxed opacity-90">${s.body}</div>
           </div>
 
           <div class="mt-4 border-l-4 border-[#040a04] pl-3 py-1 bg-[#040a04]/5">
             <div class="text-[20px] font-heading leading-none">${s.statVal}</div>
-            <div class="text-[6px] font-mono opacity-60 mt-1 uppercase">${s.statLabel}</div>
+            <div class="text-[10px] font-mono opacity-60 mt-1 uppercase">${s.statLabel}</div>
           </div>
         </div>
 
