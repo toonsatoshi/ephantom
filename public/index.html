@@ -43,7 +43,7 @@
             <canvas id="screen-canvas" class="absolute inset-0 z-30 pointer-events-none opacity-30 mix-blend-overlay"></canvas>
             <div id="screen" class="w-full h-full bg-[#050c05] overflow-hidden relative z-20">
               <div id="game-view" class="w-full h-full p-7 flex flex-col items-center justify-center">
-                <div class="text-[18px] animate-pulse text-[#0f380f]">INIT_PHYS_ENGINE...</div>
+                <div class="text-[18px] animate-pulse text-[#8bac0f]">INIT_PHYS_ENGINE...</div>
               </div>
             </div>
             <div id="glass-reflection" class="absolute inset-0 z-40 pointer-events-none"></div>
@@ -51,7 +51,7 @@
             <div class="micro-pixel-grid absolute inset-0 z-28 pointer-events-none opacity-10"></div>
           </div>
           <div class="flex justify-between mt-7 px-2 items-center relative z-50">
-            <span class="text-[10px] text-zinc-500 font-bold uppercase tracking-[0.25em]">DOT MATRIX OS / GENESIS</span>
+            <span class="text-[10px] text-zinc-400 font-bold uppercase tracking-[0.25em]">DOT MATRIX OS / GENESIS</span>
             <div class="flex items-center gap-2.5">
                <div class="w-5 h-5 rounded-sm bg-zinc-800 flex items-center justify-center border border-white/5 relative">
                   <div id="power-led" class="w-3 h-3 rounded-full bg-red-950 transition-all duration-300"></div>
@@ -61,10 +61,10 @@
           </div>
         </div>
 
-        <div class="w-full flex-1 flex flex-col justify-between mt-22 relative z-20">
-          <div class="flex justify-between items-start px-4">
-            <div class="relative w-52 h-52 rounded-full bg-black/40 shadow-[inset_0_9px_20px_rgba(0,0,0,0.8)] flex items-center justify-center">
-              <div id="dpad-container" class="relative w-40 h-40 transition-transform duration-100">
+        <div class="w-full flex-1 flex flex-col justify-between mt-12 relative z-20">
+          <div class="flex justify-between items-start px-8">
+            <div class="relative w-44 h-44 rounded-full bg-black/40 shadow-[inset_0_9px_20px_rgba(0,0,0,0.8)] flex items-center justify-center">
+              <div id="dpad-container" class="relative w-32 h-32 transition-transform duration-100">
                 <div class="absolute inset-[33%] bg-zinc-800 z-10 shadow-2xl"></div>
                 <button id="btn-up" aria-label="Up" class="left-[35%] top-0 w-[30%] h-[35%] rounded-t-md"></button>
                 <button id="btn-down" aria-label="Down" class="left-[35%] bottom-0 w-[30%] h-[35%] rounded-b-md"></button>
@@ -73,14 +73,14 @@
               </div>
             </div>
             
-            <div class="flex gap-14 mt-22 -rotate-12">
+            <div class="flex gap-10 mt-14 -rotate-12">
               <div class="flex flex-col items-center">
-                <button id="btn-b" aria-label="Button B" class="scale-[1.65] flex items-center justify-center text-white/20 font-bold text-[14px] pt-1">B</button>
-                <span class="text-[16px] text-purple-200/40 font-bold mt-5">B</span>
+                <button id="btn-b" aria-label="Button B" class="flex items-center justify-center text-white/40 font-bold text-[18px] pt-1">B</button>
+                <span class="text-[18px] text-purple-200/60 font-bold mt-4">B</span>
               </div>
               <div class="flex flex-col items-center">
-                <button id="btn-a" aria-label="Button A" class="scale-[1.65] flex items-center justify-center text-white/20 font-bold text-[14px] pt-1">A</button>
-                <span class="text-[16px] text-purple-200/40 font-bold mt-5">A</span>
+                <button id="btn-a" aria-label="Button A" class="flex items-center justify-center text-white/40 font-bold text-[18px] pt-1">A</button>
+                <span class="text-[18px] text-purple-200/60 font-bold mt-4">A</span>
               </div>
             </div>
           </div>
@@ -95,14 +95,14 @@
             <div class="speaker-slit"></div>
           </div>
 
-          <div class="flex justify-center gap-28 mb-18 -rotate-[20deg]">
+          <div class="flex justify-center gap-24 mb-14 -rotate-[20deg]">
             <div class="flex flex-col items-center">
-              <button id="btn-select" aria-label="Select" class="scale-[1.65]"></button>
-              <span class="text-[13px] text-purple-200/30 font-bold mt-5 uppercase tracking-tight">Select</span>
+              <button id="btn-select" aria-label="Select" class=""></button>
+              <span class="text-[14px] text-purple-200/50 font-bold mt-4 uppercase tracking-tight">Select</span>
             </div>
             <div class="flex flex-col items-center">
-              <button id="btn-start" aria-label="Start" class="scale-[1.65]"></button>
-              <span class="text-[13px] text-purple-200/30 font-bold mt-5 uppercase tracking-tight">Start</span>
+              <button id="btn-start" aria-label="Start" class=""></button>
+              <span class="text-[14px] text-purple-200/50 font-bold mt-4 uppercase tracking-tight">Start</span>
             </div>
           </div>
         </div>

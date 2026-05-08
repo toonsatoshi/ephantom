@@ -85,33 +85,31 @@ body {
   image-rendering: auto; /* Ensure fonts look smooth */
 }
 #screen * {
-  -webkit-text-stroke: 0.8px #fff;
-  paint-order: stroke fill;
-  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+  /* Removed stroke to improve readability */
+  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
 }
 #screen .font-heading {
-  -webkit-text-stroke: 2.2px #fff;
+  /* Simplified for better readability */
 }
 #screen .selected, #screen .selected * {
-  -webkit-text-stroke: 0;
   text-shadow: none;
 }
 #screen::after {
   content: "";
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at center, transparent 40%, rgba(0,0,0,0.4) 100%);
+  background: radial-gradient(circle at center, transparent 40%, rgba(0,0,0,0.2) 100%);
   pointer-events: none;
   z-index: 30;
 }
-#led-glow { position: absolute; width: 44px; height: 44px; border-radius: 50%; background-color: rgba(220, 38, 38, 0.2); filter: blur(11px); opacity: 0; pointer-events: none; transition: opacity 0.3s ease-out; }
+#led-glow { position: absolute; width: 44px; height: 44px; border-radius: 50%; background-color: rgba(220, 38, 38, 0.4); filter: blur(11px); opacity: 0; pointer-events: none; transition: opacity 0.3s ease-out; }
 /* Enhanced Buttons */
 #dpad-container { 
   position: relative; 
-  width: 162px; 
-  height: 162px; 
+  width: 140px; 
+  height: 140px; 
   transition: transform 0.1s ease-out;
-  filter: drop-shadow(0 8px 16px rgba(0,0,0,0.7));
+  filter: drop-shadow(0 6px 12px rgba(0,0,0,0.7));
 }
 #btn-up, #btn-down, #btn-left, #btn-right { 
   background: linear-gradient(145deg, #2a2a2e, #1a1a1c);
@@ -123,26 +121,26 @@ body {
 }
 #btn-up { border-top: 1px solid rgba(255,255,255,0.05); }
 #btn-a, #btn-b { 
-  width: 102px; 
-  height: 102px; 
+  width: 80px; 
+  height: 80px; 
   border-radius: 50%; 
   background: linear-gradient(145deg, #a00030, #600010);
   box-shadow: 
-    0 12px 0 #300008, 
-    0 18px 32px rgba(0,0,0,0.6),
-    inset 0 5px 8px rgba(255,255,255,0.2); 
+    0 8px 0 #300008, 
+    0 12px 24px rgba(0,0,0,0.6),
+    inset 0 4px 6px rgba(255,255,255,0.2); 
   transition: all 0.05s; 
 }
 #btn-a:active, #btn-b:active { 
-  transform: translateY(8px) scale(0.98); 
-  box-shadow: 0 4px 0 #300008, inset 0 5px 8px rgba(0,0,0,0.4); 
+  transform: translateY(6px) scale(0.98); 
+  box-shadow: 0 3px 0 #300008, inset 0 4px 6px rgba(0,0,0,0.4); 
 }
 #btn-start, #btn-select { 
-  width: 102px; 
-  height: 26px; 
+  width: 70px; 
+  height: 20px; 
   background: linear-gradient(145deg, #414145, #212125);
   border-radius: 9999px; 
-  box-shadow: 0 8px 0 #18181b, inset 0 2px 2px rgba(255,255,255,0.1); 
+  box-shadow: 0 6px 0 #18181b, inset 0 2px 2px rgba(255,255,255,0.1); 
   transition: transform 0.05s; 
 }
 #btn-start:active, #btn-select:active { transform: translateY(6px); }
