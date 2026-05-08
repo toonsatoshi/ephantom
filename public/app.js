@@ -30,13 +30,17 @@ class EphantomOS {
     ]
     this.introTimer     = null
     this.menuIndex      = 0
-    this.menuOptions    = ['THE MATRIX', 'THE FORGE', 'ENTITIES', 'DAO ROSTER', 'THE VAULT', 'CONNECT WALLET']
+    this.menuOptions    = ['THE MATRIX', 'THE FORGE', 'ENTITIES', 'SYSTEM OVERVIEW', 'DAO ROSTER', 'THE VAULT', 'CONNECT WALLET']
     this.isBooted       = false
     this.bootLock       = false
     this.inputThrottle  = false
     this.audioCtx       = null
     this.batteryLevel   = 100
     this.isCharging     = false
+
+    // ── Slide state ──────────────────────────────────────────
+    this.currentSlide   = 0
+    this.totalSlides    = 9
 
     // ── Telegram / Wallet state ──────────────────────────────
     this.tg             = window.Telegram?.WebApp
@@ -342,11 +346,17 @@ class EphantomOS {
     switch (this.currentState) {
       case 'THE MATRIX': this._matrixInput(action); break
       case 'THE FORGE':  this._forgeInput(action);  break
-      case 'ENTITIES':   this._rosterInput(action); break
+      case 'ENTITIES':     this._rosterInput(action); break
       case 'DAO ROSTER': this._daoRosterInput(action); break
       case 'THE VAULT':  this._vaultInput(action);  break
-    }
-  }
+      case 'SYSTEM OVERVIEW': this._slideInput(action); break
+      }
+      }
+
+      _slideInput(action) {
+      if (action === 'left')  this.currentSlide = Math.max(0, this.currentSlide - 1)
+      if (action === 'right') this.currentSlide = Math.min(this.totalSlides - 1, this.currentSlide + 1)
+      }
 
   _matrixInput(action) {
     const total = this.tracks.length
@@ -490,6 +500,7 @@ class EphantomOS {
         case 'DAO ROSTER':   this._renderDaoRoster(); break
         case 'THE VAULT':   this._renderVault();   break
         case 'CONNECT WALLET': this._renderConnectWallet(); break
+        case 'SYSTEM OVERVIEW': this._renderSlides(); break
       }
     } catch (err) {
       console.error("OS_RENDER_ERROR:", err)
@@ -729,6 +740,123 @@ class EphantomOS {
           `}
         </div>
         <div class="mt-auto text-[6px] opacity-40 italic text-center">REQUIRES TELEGRAM APP</div>
+      </div>`
+  }
+
+  _renderSlides() {
+    const slides = [
+      {
+        id: 0,
+        pill: 'ROLE: CURATOR',
+        title: 'THE CURATOR',
+        tagline: 'Your Taste. Your Influence.',
+        body: "You're not just a listener — you're a decision-maker. Curators propose, vote on, and shape which AI-assisted tracks get released to the world. The more your picks perform on streaming platforms, the more reputation you earn. More reputation means more weight in future votes.",
+        statVal: '40%',
+        statLabel: 'of royalties go to the crowd'
+      },
+      {
+        id: 1,
+        pill: 'SYSTEM: MEMBERSHIP',
+        title: 'THE TRIBUTE GATE',
+        tagline: 'Start Free. Level Up When You\'re Ready.',
+        body: "EPHANTOM is financially self-sustaining from day one. Active Curators pay $9/month to unlock voting rights and royalty distributions. This keeps the crowd serious and the Sybil bots out. Subscription fees fund operations, legal, and infrastructure.",
+        statVal: '$9',
+        statLabel: 'monthly subscription fee'
+      },
+      {
+        id: 2,
+        pill: 'TOKEN: JETTON REWARD',
+        title: 'THE CURATION TOKEN',
+        tagline: 'Curate Anything. Earn Everything.',
+        body: "A real Jetton token ($PHNTM) on the TON blockchain. Every curation action you take earns you tokens. Your reputation score acts as a permanent multiplier on every token you earn. Stack it, trade it, list it on TON DEXs.",
+        statVal: '$PHNTM',
+        statLabel: 'Jetton on TON blockchain'
+      },
+      {
+        id: 3,
+        pill: 'ROLE: ARCHITECT',
+        title: 'THE ARCHITECT',
+        tagline: 'Build the Sound. Earn the Royalties.',
+        body: "Architects are the creators. Submit your AI-assisted track during the 72-hour window. If the crowd votes yours as the winner, you earn 40% of all streaming and licensing royalties — no label deal, no middlemen.",
+        statVal: '40%',
+        statLabel: 'royalty share for winners'
+      },
+      {
+        id: 4,
+        pill: 'SYSTEM: CONSENSUS',
+        title: 'CONSENSUS MATRIX',
+        tagline: 'Democracy, Reputation-Weighted.',
+        body: "Every cycle runs on a 72-hour vote. Votes are weighted by earned reputation — not money, not followers. The track that earns the crowd's approval gets released globally through major streaming platforms.",
+        statVal: '72h',
+        statLabel: 'per vote cycle'
+      },
+      {
+        id: 5,
+        pill: 'ROLE: REFINEMENT',
+        title: 'REFINEMENT NODE',
+        tagline: 'Polish It. Get Paid.',
+        body: "Producers and mixers who take the winning track from raw to release-ready. Submit your project file and proof of work. Verified contributors split 10% of that cycle's royalties.",
+        statVal: '10%',
+        statLabel: 'refinement royalty share'
+      },
+      {
+        id: 6,
+        pill: 'CONCEPT: THE ARTIST',
+        title: 'INSTANCED IDENTITY',
+        tagline: 'The Artist is a Living System.',
+        body: "Virtual music artists defined by crowd vote and ratified on-chain. Sound evolves every cycle based on collective decisions. No single human owns it. Everyone who shapes it shares in its success.",
+        statVal: '∞',
+        statLabel: 'possible artist identities'
+      },
+      {
+        id: 7,
+        pill: 'SYSTEM: TREASURY',
+        title: 'THE TREASURY',
+        tagline: 'The Engine That Keeps It All Running.',
+        body: "10% of every cycle's royalties flow to the Protocol Treasury — funding infrastructure, moderation, marketing, and legal ops via a Wyoming SPV. Transparent spending, on-chain accountability.",
+        statVal: '10%',
+        statLabel: 'protocol treasury allocation'
+      },
+      {
+        id: 8,
+        pill: 'ECONOMICS: OVERVIEW',
+        title: 'REVENUE STREAMS',
+        tagline: 'The DAO Doesn\'t Wait for a Hit.',
+        body: "EPHANTOM is financially self-sustaining from day one. Revenue flows from Curator Subscriptions ($9/mo), Architect Submission Fees ($15/track), and Streaming Royalties (10% to Treasury).",
+        statVal: '3',
+        statLabel: 'independent revenue sources'
+      }
+    ]
+
+    const s = slides[this.currentSlide]
+    this.viewContainer.innerHTML = `
+      <div class="w-full h-full p-2 flex flex-col text-[#040a04] font-tech relative overflow-hidden">
+        <div class="text-[5px] font-retro border-b border-[#040a04] pb-1 mb-2 flex justify-between">
+          <span>SYSTEM_OVERVIEW</span>
+          <span>SLIDE ${this.currentSlide + 1}/9</span>
+        </div>
+        
+        <div class="flex-1 flex flex-col justify-between fade-in">
+          <div>
+            <div class="bg-[#040a04] text-[#8bac0f] px-2 py-0.5 text-[6px] font-retro inline-block mb-2 border border-white/20">${s.pill}</div>
+            <div class="text-[14px] font-heading leading-tight mb-1">${s.title}</div>
+            <div class="text-[8px] font-mono opacity-70 mb-2 italic">"${s.tagline}"</div>
+            <div class="text-[7px] leading-relaxed opacity-90">${s.body}</div>
+          </div>
+
+          <div class="mt-4 border-l-4 border-[#040a04] pl-3 py-1 bg-[#040a04]/5">
+            <div class="text-[20px] font-heading leading-none">${s.statVal}</div>
+            <div class="text-[6px] font-mono opacity-60 mt-1 uppercase">${s.statLabel}</div>
+          </div>
+        </div>
+
+        <div class="mt-3 flex justify-between items-center text-[5px] font-retro opacity-40">
+          <span>[L/R] NAVIGATE</span>
+          <div class="flex gap-1.5">
+            ${slides.map((_, i) => `<div class="w-1 h-1 rounded-full ${i === this.currentSlide ? 'bg-[#040a04]' : 'bg-[#040a04]/20'}"></div>`).join('')}
+          </div>
+          <span>[B] MENU</span>
+        </div>
       </div>`
   }
 
