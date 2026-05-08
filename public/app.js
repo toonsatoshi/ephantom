@@ -38,6 +38,12 @@ class EphantomOS {
     this.batteryLevel   = 100
     this.isCharging     = false
 
+    // ── Music Player state ────────────────────────────────────
+    this.playerIndex    = 0
+    this.isPlaying      = false
+    this.audioElement   = new Audio()
+    this.curationStatus = null // 'LIKED' | 'DISLIKED' | 'SKIPPED'
+
     // ── Slide state ──────────────────────────────────────────
     this.currentSlide   = 0
     this.totalSlides    = 9
@@ -327,10 +333,10 @@ class EphantomOS {
       if (action === 'a') { this.connectWallet() }
       if (action === 'b') { this.currentState = 'MENU' }
     } else {
-      if (action === 'b' && !this._forgeIsDeep()) {
+      if (action === 'b') {
         this.currentState = 'MENU'
         this.beep(220, 0.12)
-        this._resetForge()
+        this._stopAudio()
       } else {
         this.routeInputToView(action)
       }
@@ -338,14 +344,15 @@ class EphantomOS {
     this.render()
   }
 
-  _forgeIsDeep() {
-    return this.currentState === 'THE FORGE' && this.forgeStep > 0 && this.forgeStep < 4
+  _stopAudio() {
+    this.isPlaying = false
+    this.audioElement.pause()
   }
 
   routeInputToView(action) {
     switch (this.currentState) {
       case 'THE MATRIX': this._matrixInput(action); break
-      case 'THE FORGE':  this._forgeInput(action);  break
+      case 'THE FORGE':  this._playerInput(action);  break
       case 'ENTITIES':     this._rosterInput(action); break
       case 'DAO ROSTER': this._daoRosterInput(action); break
       case 'THE VAULT':  this._vaultInput(action);  break
@@ -358,130 +365,59 @@ class EphantomOS {
       if (action === 'right') this.currentSlide = Math.min(this.totalSlides - 1, this.currentSlide + 1)
       }
 
-  _matrixInput(action) {
+  _playerInput(action) {
+    if (action === 'left')  this._curate('DISLIKE')
+    if (action === 'right') this._curate('LIKE')
+    if (action === 'a')     this._togglePlay()
+    if (action === 'up')    this._nextTrack()
+    if (action === 'down')  this._prevTrack()
+  }
+
+  _curate(direction) {
+    this.curationStatus = direction === 'LIKE' ? 'LIKED' : 'DISLIKED'
+    this.beep(direction === 'LIKE' ? 880 : 220, 0.1)
+    this.haptic(direction === 'LIKE' ? 'medium' : 'heavy')
+    
+    // Simulate API call for curation
+    setTimeout(() => {
+      this.curationStatus = null
+      this._nextTrack()
+      this.render()
+    }, 600)
+    this.render()
+  }
+
+  _togglePlay() {
+    this.isPlaying = !this.isPlaying
+    if (this.isPlaying) {
+      this.audioElement.play().catch(e => console.warn("Audio play blocked", e))
+      this.beep(660, 0.1)
+    } else {
+      this.audioElement.pause()
+      this.beep(440, 0.1)
+    }
+  }
+
+  _nextTrack() {
     const total = this.tracks.length
-    if (action === 'left')  this.matrixIndex = (this.matrixIndex - 1 + total) % total
-    if (action === 'right') this.matrixIndex = (this.matrixIndex + 1) % total
-    if (action === 'a')     this._castVote()
+    if (total === 0) return
+    this.playerIndex = (this.playerIndex + 1) % total
+    this._loadTrack()
   }
 
-  async _castVote() {
-    const trk = this.tracks[this.matrixIndex]
-    if (!trk) return
-    if (this.votedIds.has(trk.id)) {
-      this._flash('ALREADY_VOTED')
-      this.beep(160, 0.2, 'sawtooth')
-      return
+  _prevTrack() {
+    const total = this.tracks.length
+    if (total === 0) return
+    this.playerIndex = (this.playerIndex - 1 + total) % total
+    this._loadTrack()
+  }
+
+  _loadTrack() {
+    const trk = this.tracks[this.playerIndex]
+    if (trk && trk.url) {
+      this.audioElement.src = trk.url
+      if (this.isPlaying) this.audioElement.play().catch(e => console.warn("Audio play blocked", e))
     }
-    try {
-      const res = await fetch(`/api/vote/${trk.id}`, { method: 'POST' })
-      const data = await res.json()
-      if (data.ok) {
-        this.votedIds.add(trk.id)
-        const local = this.tracks.find(t => t.id === trk.id)
-        if (local) { local.votes = data.track.votes; local.rep_weight = data.track.rep_weight }
-        if (data.cycle) { this.cycle.current_voters = data.cycle.current_voters; this.cycle.quorum_met = data.cycle.quorum_met }
-        this._flash('SYNCED')
-        this.beep(1100, 0.25, 'triangle')
-      } else {
-        this._flash(data.error || 'ERROR')
-        this.beep(160, 0.2, 'sawtooth')
-      }
-    } catch {
-      this.votedIds.add(trk.id)
-      trk.votes += 1
-      if (this.cycle) this.cycle.current_voters = Math.min((this.cycle.current_voters||38)+1, 60)
-      this._flash('SYNCED')
-      this.beep(1100, 0.25, 'triangle')
-    }
-  }
-
-  _flash(status) {
-    this.matrixStatus = status
-    this.render()
-    setTimeout(() => { this.matrixStatus = null; this.render() }, 1100)
-  }
-
-  _forgeInput(action) {
-    if (this.forgePending) return
-    const ents = this.entities.length ? this.entities : this._stubEntities()
-    const ii   = ents[this.forgeIIIndex] || ents[0]
-    switch (this.forgeStep) {
-      case 0:
-        if (action === 'left')  this.forgeIIIndex = (this.forgeIIIndex - 1 + ents.length) % ents.length
-        if (action === 'right') this.forgeIIIndex = (this.forgeIIIndex + 1) % ents.length
-        if (action === 'a')     { this.forgeBPM = ii.bpm_range[0]; this.forgeStep = 1; this.beep(660,0.1) }
-        break
-      case 1:
-        if (action === 'up')    this.forgeBPM = Math.min(this.forgeBPM + this.forgeBPMStep, ii.bpm_range[1])
-        if (action === 'down')  this.forgeBPM = Math.max(this.forgeBPM - this.forgeBPMStep, ii.bpm_range[0])
-        if (action === 'a')     { this.forgeStep = 2; this.beep(660,0.1) }
-        if (action === 'b')     { this.forgeStep = 0; this.beep(220,0.08) }
-        break
-      case 2:
-        if (action === 'up')    this.forgeGenreIndex = (this.forgeGenreIndex - 1 + this.forgeGenres.length) % this.forgeGenres.length
-        if (action === 'down')  this.forgeGenreIndex = (this.forgeGenreIndex + 1) % this.forgeGenres.length
-        if (action === 'a')     { this.forgeStep = 3; this.beep(660,0.1) }
-        if (action === 'b')     { this.forgeStep = 1; this.beep(220,0.08) }
-        break
-      case 3:
-        if (action === 'a')     this._submitForge()
-        if (action === 'b')     { this.forgeStep = 2; this.beep(220,0.08) }
-        break
-      case 4:
-        if (action === 'a' || action === 'b') this._resetForge()
-        break
-    }
-  }
-
-  async _submitForge() {
-    this.forgePending = true
-    this.forgeStep = 'LOADING'
-    this.render()
-    const ents = this.entities.length ? this.entities : this._stubEntities()
-    const ii   = ents[this.forgeIIIndex] || ents[0]
-    const genre = this.forgeGenres[this.forgeGenreIndex]
-    const payload = {
-      ii_id: ii.id,
-      bpm: this.forgeBPM,
-      genre: genre,
-      title: `${genre.replace(/\s/g,'_')}_${Date.now().toString(36).toUpperCase().slice(-4)}`,
-    }
-    try {
-      const res = await fetch('/api/forge', { method: 'POST', headers: { 'Content-Type':'application/json' }, body: JSON.stringify(payload) })
-      const data = await res.json()
-      this.forgeResult = data
-      if (data.ok) {
-        this.tracks.push(data.track)
-        this.beep(880, 0.3, 'triangle')
-        setTimeout(() => this.beep(1100, 0.15, 'triangle'), 300)
-      }
-    } catch {
-      this.forgeResult = { ok: true, track: { ...payload, id: Date.now(), votes:0, ii_name: ii.name, cycle_id: this.cycle?.id || 7, architect: 'usr_LOCAL', rep_weight: 0 } }
-      this.tracks.push(this.forgeResult.track)
-      this.beep(880, 0.3, 'triangle')
-    }
-    this.forgePending = false
-    this.forgeStep = 4
-    this.render()
-  }
-
-  _resetForge() {
-    this.forgeStep = 0
-    this.forgeResult = null
-    this.forgePending = false
-    this.forgeGenreIndex = 0
-  }
-
-  _rosterInput(action) {
-    const total = this.entities.length
-    if (action === 'left')  this.rosterIndex = (this.rosterIndex - 1 + total) % total
-    if (action === 'right') this.rosterIndex = (this.rosterIndex + 1) % total
-  }
-
-  _vaultInput(action) {
-    if (action === 'left')  this.vaultPage = Math.max(0, this.vaultPage - 1)
-    if (action === 'right') this.vaultPage = Math.min(2, this.vaultPage + 1)
   }
 
   render() {
@@ -495,7 +431,7 @@ class EphantomOS {
         case 'SPLASH':       this._renderSplash();  break
         case 'MENU':         this._renderMenu();    break
         case 'THE MATRIX':  this._renderMatrix();  break
-        case 'THE FORGE':   this._renderForge();   break
+        case 'THE FORGE':   this._renderPlayer();  break
         case 'ENTITIES':     this._renderRoster();  break
         case 'DAO ROSTER':   this._renderDaoRoster(); break
         case 'THE VAULT':   this._renderVault();   break
@@ -507,170 +443,62 @@ class EphantomOS {
     }
   }
 
-  _renderIntro() {
-    const item = this.introPhrases[this.introStep] || { text: "", font: "font-tech", size: "10px" }
-    this.viewContainer.innerHTML = `
-      <div class="flex flex-col items-center justify-center h-full text-[#8bac0f] p-4 text-center">
-        <div class="cinematic-text ${item.font} font-bold tracking-tight leading-tight drop-shadow-lg" style="font-size: ${item.size}">
-          ${item.text}
-        </div>
-        <div class="absolute bottom-4 text-[10px] font-retro opacity-20 fade-in">[B] SKIP INTRO</div>
-      </div>`
-  }
-
-  _renderSplash() {
-    this.viewContainer.innerHTML = `
-      <div class="flex flex-col items-center justify-center h-full text-[#8bac0f] p-3 text-center">
-        <div class="text-[24px] font-heading tracking-tight leading-none mb-3 drop-shadow-lg">EPHANTOM</div>
-        <div class="text-[10px] font-tech leading-tight opacity-95 mb-4 px-1 max-w-[90%] font-bold">
-          DECENTRALIZED AUTONOMOUS MUSIC LABEL
-        </div>
-        <div class="text-[7px] font-mono opacity-80 mb-4 border-y border-[#040a04]/20 py-2 px-1">
-          AI SYNTHESIZES. HUMANS CURATE.<br>EVOLVE THE IDENTITY.
-        </div>
-        <div class="text-[5px] font-sci opacity-60 mb-4 uppercase tracking-[0.1em] leading-relaxed italic max-w-[80%]">
-          "Doing more and more with less and less until we can do everything with nothing"
-        </div>
-        <div class="mt-4 animate-pulse bg-[#040a04] text-[#8bac0f] px-4 py-2 text-[10px] border-2 border-[#fff] font-retro">PRESS START</div>
-        <div class="mt-4 text-[10px] font-retro opacity-30 tracking-widest flex flex-col gap-1">
-           <span>DAO_ROSTER: @zalgorythms</span>
-           <span>ESTD. 2026</span>
-        </div>
-      </div>`
-  }
-
-  _renderMenu() {
-    const cycle = this.cycle || this._stubCycle()
-    const phase = cycle.phase
-    const c_id  = `#${cycle.id}`
-    this.viewContainer.innerHTML = `
-      <div class="w-full p-2 text-[#8bac0f] font-tech">
-        <div class="text-[7px] font-retro border-b-2 border-[#040a04] mb-2 pb-1 flex justify-between items-center">
-          <span>ROOT_SYS</span>
-          <span>CYC${c_id}·${phase}</span>
-        </div>
-        <div class="space-y-1">
-          ${this.menuOptions.map((opt, i) => `
-            <div class="px-2 py-1 text-[10px] font-heading flex justify-between items-center ${this.menuIndex === i ? 'selected' : ''}">
-              <span>${opt}</span>
-              ${this.menuIndex === i ? '<span class="text-[10px]">▶</span>' : ''}
-            </div>
-          `).join('')}
-        </div>
-        <div class="mt-3 text-[10px] font-retro opacity-40 flex justify-between border-t border-[#040a04]/10 pt-2">
-          <span>BATT:${this.batteryLevel}%</span>
-          <span>REP:${this.vault ? this.vault.reputation : '...'}</span>
-        </div>
-      </div>`
-  }
-
-  _renderMatrix() {
-    const cycle  = this.cycle || this._stubCycle()
+  _renderPlayer() {
     const tracks = this.tracks.length ? this.tracks : this._stubTracks()
-    const trk    = tracks[this.matrixIndex]
+    const trk    = tracks[this.playerIndex]
     const total  = tracks.length
-    const quorum = cycle.current_voters || 0
-    const minQ   = cycle.min_quorum || 50
-    const qPct   = Math.min(100, Math.round(quorum / minQ * 100))
-    const hasVoted = trk && this.votedIds.has(trk.id)
-
-    let timeStr = '?'
-    if (cycle.vote_end) {
-      const ms = cycle.vote_end - Date.now()
-      if (ms > 0) {
-        const h = Math.floor(ms / 3600000)
-        const m = Math.floor((ms % 3600000) / 60000)
-        timeStr = `${h}H ${m}M`
-      } else {
-        timeStr = 'CLOSED'
-      }
-    }
 
     if (!trk) {
       this.viewContainer.innerHTML = `
         <div class="w-full h-full p-2 flex flex-col items-center justify-center text-[#8bac0f] font-tech">
-          <div class="text-[10px] opacity-40 mb-2">THE MATRIX</div>
-          <div class="text-[10px] animate-pulse">NO_ACTIVE_TRACKS</div>
+          <div class="text-[10px] opacity-40 mb-2">THE FORGE</div>
+          <div class="text-[10px] animate-pulse">NO_TRACKS_AVAILABLE</div>
         </div>`
       return
     }
 
-    const leadTrk = [...tracks].sort((a,b)=>b.rep_weight-a.rep_weight)[0]
-
     this.viewContainer.innerHTML = `
-      <div class="w-full h-full p-2 flex flex-col text-[#8bac0f] relative font-tech">
+      <div class="w-full h-full p-2 flex flex-col text-[#8bac0f] font-tech relative">
         <div class="text-[10px] font-retro border-b border-[#040a04] pb-1 mb-2 flex justify-between">
-          <span>CYC#${cycle.id} · ${cycle.phase}</span>
-          <span>${timeStr}</span>
+          <span>THE_PLAYER</span>
+          <span>[${this.playerIndex + 1}/${total}]</span>
         </div>
-        <div class="mb-2">
-          <div class="flex justify-between text-[7px] font-retro mb-1">
-            <span>QUORUM</span>
-            <span>${quorum}/${minQ} ${cycle.quorum_met ? '✓' : ''}</span>
+        
+        <div class="flex-1 flex flex-col items-center justify-center text-center">
+          <div class="w-32 h-32 bg-[#040a04]/20 border-2 border-[#8bac0f] mb-4 relative overflow-hidden flex items-center justify-center shadow-inner">
+            <div class="text-[40px] ${this.isPlaying ? 'animate-spin' : ''} opacity-40">⬡</div>
+            ${this.isPlaying ? '<div class="absolute inset-0 bg-[#8bac0f]/10 animate-pulse"></div>' : ''}
           </div>
-          <div class="h-1.5 w-full bg-[#040a04]/10 border border-[#040a04]/20">
-            <div class="h-full bg-[#040a04]" style="width:${qPct}%"></div>
-          </div>
-        </div>
-        <div class="matrix-card flex-1 flex flex-col p-2 bg-[#040a04]/5 relative">
-          <div class="text-[7px] font-retro opacity-50 mb-1">ARTIFAC [${this.matrixIndex+1}/${total}]</div>
-          <div class="text-[12px] font-heading leading-tight mb-2">${trk.title}</div>
-          <div class="text-[10px] font-mono opacity-60">${trk.ii_name}</div>
-          <div class="flex gap-2 mt-2 text-[7px] font-retro">
-            <span class="bg-[#040a04]/10 px-1">${trk.genre}</span>
-            <span>${trk.bpm}BPM</span>
-          </div>
-          <div class="mt-auto text-[7px] font-mono flex justify-between opacity-70">
-            <span>BY ${trk.architect?.slice(0,10)}</span>
-            <span>▲${trk.votes} · ⚖${(trk.rep_weight||0).toLocaleString()}</span>
+          
+          <div class="text-[14px] font-heading leading-tight mb-1 truncate w-full px-2">${trk.title}</div>
+          <div class="text-[10px] font-mono opacity-60 mb-3">${trk.ii_name}</div>
+          
+          <div class="flex gap-4 items-center">
+            <div class="text-[8px] font-retro opacity-40">◀ DISLIKE</div>
+            <div class="bg-[#8bac0f] text-[#040a04] px-3 py-1 text-[10px] font-retro border border-white/20">
+              ${this.isPlaying ? 'PAUSE' : 'PLAY'}
+            </div>
+            <div class="text-[8px] font-retro opacity-40">LIKE ▶</div>
           </div>
         </div>
-        <div class="mt-2 text-[10px] font-retro flex justify-between items-center">
-          ${hasVoted ? '<span class="text-[#99ff99]">✓ VOTE_CAST</span>' : '<span class="animate-pulse">[A] VOTE</span>'}
-          <span class="opacity-40">LEAD: ${leadTrk.title.slice(0,8)}</span>
+
+        <div class="mt-4 bg-[#040a04]/10 h-1 relative overflow-hidden">
+          <div class="h-full bg-[#8bac0f] transition-all duration-300" style="width: ${this.isPlaying ? '45%' : '0%'}"></div>
         </div>
-        ${this.matrixStatus ? `<div class="absolute inset-0 flex items-center justify-center z-10"><div class="stamp-animation border-4 border-[#040a04] px-3 py-2 bg-[#8bac0f] font-heading text-[10px] -rotate-12">${this.matrixStatus}</div></div>` : ''}
+
+        <div class="mt-2 text-[7px] font-mono flex justify-between opacity-50">
+          <span>${trk.genre}</span>
+          <span>${trk.bpm} BPM</span>
+        </div>
+
+        ${this.curationStatus ? `
+          <div class="absolute inset-0 flex items-center justify-center z-50 bg-[#050c05]/80">
+            <div class="stamp-animation border-4 border-[#8bac0f] px-4 py-2 bg-[#040a04] font-heading text-[12px] -rotate-12">
+              ${this.curationStatus}
+            </div>
+          </div>
+        ` : ''}
       </div>`
-  }
-
-  _renderForge() {
-    const ents = this.entities.length ? this.entities : this._stubEntities()
-    if (ents.length === 0) return
-    const ii   = ents[this.forgeIIIndex] || ents[0]
-
-    if (this.forgeStep === 'LOADING') {
-      this.viewContainer.innerHTML = `<div class="w-full h-full p-2 flex flex-col text-[#8bac0f] font-tech"><div class="text-[10px] font-retro border-b border-[#040a04] mb-3 pb-1">FORGE_CONSOLE</div><div class="flex-1 flex flex-col justify-center items-center gap-2"><div class="text-[10px] font-heading animate-pulse">SYNTHESIZING...</div><div class="text-[7px] opacity-60">${ii.name}</div><div class="h-1.5 w-full bg-[#040a04]/10 mt-2"><div class="h-full bg-[#040a04] animate-pulse" style="width:66%"></div></div></div></div>`
-      return
-    }
-
-    if (this.forgeStep === 4 && this.forgeResult) {
-      const ok = this.forgeResult.ok
-      const trk = this.forgeResult.track
-      this.viewContainer.innerHTML = `<div class="w-full h-full p-2 flex flex-col text-[#8bac0f] font-tech"><div class="text-[10px] font-retro border-b border-[#040a04] mb-2 pb-1">FORGE_RESULT</div><div class="flex-1 flex flex-col justify-center items-center text-center gap-2">${ok ? `<div class="text-[20px] font-heading">⬡</div><div class="text-[10px] font-bold">TRACK SUBMITTED</div><div class="text-[10px] font-mono mt-1">${trk?.title}</div><div class="text-[7px] opacity-60 mt-1">${trk?.ii_name} · ${trk?.bpm}BPM</div>` : `<div class="text-[20px] font-heading">✗</div><div class="text-[10px] font-bold">${this.forgeResult.error || 'ERROR'}</div>`}</div><div class="text-[10px] font-retro text-center animate-pulse mt-2">[A/B] CONTINUE</div></div>`
-      return
-    }
-
-    const stepLabels = ['SELECT_TARGET_II','SET_BPM','SELECT_GENRE','CONFIRM_SUBMIT']
-    const stepNum    = typeof this.forgeStep === 'number' ? this.forgeStep : 0
-    const stepLabel  = stepLabels[stepNum] || 'FORGE'
-    let stepBody = ''
-
-    switch (stepNum) {
-      case 0:
-        stepBody = `<div class="text-[7px] font-retro opacity-50 mb-2">◀ [L/R] BROWSE · [A] SELECT ▶</div><div class="matrix-card p-2 flex flex-col bg-[#040a04]/5 flex-1"><div class="text-[10px] font-mono opacity-60">${ii.id}</div><div class="text-[12px] font-heading mt-1">${ii.name}</div>${ii.video ? `<div class="w-full aspect-[16/9] bg-[#040a04]/20 my-2 overflow-hidden border border-[#040a04]/40 relative pointer-events-none shadow-inner"><video src="${ii.video}" autoplay loop muted playsinline class="absolute inset-0 w-full h-full object-cover opacity-100"></video></div>` : ''}<div class="text-[10px] mt-1 font-tech leading-tight">${ii.genre_cluster}</div><div class="text-[7px] mt-2 font-mono opacity-60">${ii.lyrical_seeds.join(' · ')}</div><div class="mt-auto text-[10px] font-retro flex justify-between opacity-50"><span>${ii.releases} REL</span><span>${ii.active_curators} CUR</span><span class="${ii.status === 'ACTIVE' ? '' : 'animate-pulse'}">${ii.status}</span></div></div>`
-        break
-      case 1:
-        stepBody = `<div class="text-[7px] font-retro opacity-50 mb-2">▲▼ ADJUST · [A] CONFIRM</div><div class="flex-1 flex flex-col items-center justify-center"><div class="text-[10px] font-mono opacity-60">${ii.name}</div><div class="text-[32px] font-heading mt-2">${this.forgeBPM}</div><div class="text-[10px] font-retro mt-1">BPM</div><div class="h-2 w-full bg-[#040a04]/10 mt-4 border border-[#040a04]/20"><div class="h-full bg-[#040a04]" style="width:${Math.round((this.forgeBPM - ii.bpm_range[0]) / (ii.bpm_range[1] - ii.bpm_range[0]) * 100)}%"></div></div></div>`
-        break
-      case 2:
-        stepBody = `<div class="text-[7px] font-retro opacity-50 mb-2">▲▼ SCROLL · [A] CONFIRM</div><div class="flex-1 flex flex-col justify-center"><div class="text-[10px] font-tech opacity-30 text-center py-1">${this.forgeGenres[(this.forgeGenreIndex - 1 + this.forgeGenres.length) % this.forgeGenres.length]}</div><div class="text-[12px] font-heading text-center py-2 border-y border-[#040a04] my-2">${this.forgeGenres[this.forgeGenreIndex]}</div><div class="text-[10px] font-tech opacity-30 text-center py-1">${this.forgeGenres[(this.forgeGenreIndex + 1) % this.forgeGenres.length]}</div></div>`
-        break
-      case 3:
-        stepBody = `<div class="text-[7px] font-retro opacity-50 mb-2">[A] SUBMIT · [B] BACK</div><div class="matrix-card p-2 flex-1 bg-[#040a04]/5 font-mono"><div class="text-[10px] font-heading mb-3 border-b border-[#040a04]/20 pb-1">MANIFEST</div><div class="space-y-1.5 text-[10px]"><div class="flex justify-between"><span class="opacity-60">TARGET</span><span>${ii.name}</span></div><div class="flex justify-between"><span class="opacity-60">BPM</span><span>${this.forgeBPM}</span></div><div class="flex justify-between"><span class="opacity-60">GENRE</span><span>${this.forgeGenres[this.forgeGenreIndex]}</span></div><div class="flex justify-between"><span class="opacity-60">CYCLE</span><span>#${this.cycle?.id || 1}</span></div></div><div class="text-[7px] opacity-40 mt-4 font-tech italic">40% ARCHITECT ROYALTY IF SELECTED</div></div>`
-        break
-    }
-
-    this.viewContainer.innerHTML = `<div class="w-full h-full p-2 flex flex-col text-[#8bac0f] font-tech"><div class="text-[10px] font-retro border-b border-[#040a04] pb-1 mb-2 flex justify-between"><span>THE_FORGE</span><span>${stepNum+1}/4</span></div><div class="text-[10px] font-heading mb-2 opacity-70">${stepLabel}</div><div class="flex-1 flex flex-col">${stepBody}</div></div>`
   }
 
   _renderRoster() {
