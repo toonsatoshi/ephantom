@@ -168,7 +168,7 @@ class EphantomOS {
   }
   _stubTracks() {
     return [
-      { id: 101, title: 'NEURAL_STORM', ii_name: 'JADE KAY', architect: 'usr_ALPHA', genre: 'GLITCH', bpm: 95, votes: 12, rep_weight: 12400 },
+      { id: 101, title: 'GREEN NEEDLE', ii_name: 'JADE KAY', architect: 'usr_ALPHA', genre: 'NEO-SOUL', bpm: 95, votes: 12, rep_weight: 12400, embedUrl: 'https://audius.co/embed/track/jadekay/green-needle?flavor=card' },
       { id: 102, title: 'SILICON_SOUL', ii_name: 'JADE KAY', architect: 'usr_BETA', genre: 'AMBIENT', bpm: 82, votes: 8, rep_weight: 8900 }
     ]
   }
@@ -476,44 +476,63 @@ class EphantomOS {
     }
 
     this.viewContainer.innerHTML = `
-      <div class="w-full h-full p-2 flex flex-col text-[#8bac0f] font-tech relative">
-        <div class="text-[10px] font-retro border-b border-[#040a04] pb-1 mb-2 flex justify-between">
-          <span>THE_PLAYER</span>
-          <span>[${this.playerIndex + 1}/${total}]</span>
-        </div>
-        
-        <div class="flex-1 flex flex-col items-center justify-center text-center">
-          <div class="w-32 h-32 bg-[#040a04]/20 border-2 border-[#8bac0f] mb-4 relative overflow-hidden flex items-center justify-center shadow-inner">
-            <div class="text-[40px] ${this.isPlaying ? 'animate-spin' : ''} opacity-40">⬡</div>
-            ${this.isPlaying ? '<div class="absolute inset-0 bg-[#8bac0f]/10 animate-pulse"></div>' : ''}
-          </div>
-          
-          <div class="text-[14px] font-heading leading-tight mb-1 truncate w-full px-2">${trk.title}</div>
-          <div class="text-[10px] font-mono opacity-60 mb-3">${trk.ii_name}</div>
-          
-          <div class="flex gap-4 items-center">
-            <div class="text-[8px] font-retro opacity-40">◀ DISLIKE</div>
-            <div class="bg-[#8bac0f] text-[#040a04] px-3 py-1 text-[10px] font-retro border border-white/20">
-              ${this.isPlaying ? 'PAUSE' : 'PLAY'}
+      <div class="w-full h-full p-0 flex flex-col text-[#8bac0f] font-tech relative overflow-hidden">
+        ${trk.embedUrl ? `
+          <iframe 
+            src="${trk.embedUrl}" 
+            width="100%" 
+            height="100%" 
+            allow="encrypted-media" 
+            style="border: none; background: #000;"
+          ></iframe>
+        ` : `
+          <div class="w-full h-full p-2 flex flex-col">
+            <div class="text-[10px] font-retro border-b border-[#040a04] pb-1 mb-2 flex justify-between">
+              <span>THE_FORGE</span>
+              <span>[${this.playerIndex + 1}/${total}]</span>
             </div>
-            <div class="text-[8px] font-retro opacity-40">LIKE ▶</div>
+            
+            <div class="flex-1 flex flex-col items-center justify-center text-center">
+              <div class="w-32 h-32 bg-[#040a04]/20 border-2 border-[#8bac0f] mb-4 relative overflow-hidden flex items-center justify-center shadow-inner">
+                <div class="text-[40px] ${this.isPlaying ? 'animate-spin' : ''} opacity-40">⬡</div>
+                ${this.isPlaying ? '<div class="absolute inset-0 bg-[#8bac0f]/10 animate-pulse"></div>' : ''}
+              </div>
+              
+              <div class="text-[14px] font-heading leading-tight mb-1 truncate w-full px-2">${trk.title}</div>
+              <div class="text-[10px] font-mono opacity-60 mb-3">${trk.ii_name}</div>
+              
+              <div class="flex gap-4 items-center">
+                <div class="text-[8px] font-retro opacity-40">◀ DISLIKE</div>
+                <div class="bg-[#8bac0f] text-[#040a04] px-3 py-1 text-[10px] font-retro border border-white/20">
+                  ${this.isPlaying ? 'PAUSE' : 'PLAY'}
+                </div>
+                <div class="text-[8px] font-retro opacity-40">LIKE ▶</div>
+              </div>
+            </div>
+
+            <div class="mt-4 bg-[#040a04]/10 h-1 relative overflow-hidden">
+              <div class="h-full bg-[#8bac0f] transition-all duration-300" style="width: ${this.isPlaying ? '45%' : '0%'}"></div>
+            </div>
+
+            <div class="mt-2 text-[7px] font-mono flex justify-between opacity-50">
+              <span>${trk.genre}</span>
+              <span>${trk.bpm} BPM</span>
+            </div>
           </div>
-        </div>
-
-        <div class="mt-4 bg-[#040a04]/10 h-1 relative overflow-hidden">
-          <div class="h-full bg-[#8bac0f] transition-all duration-300" style="width: ${this.isPlaying ? '45%' : '0%'}"></div>
-        </div>
-
-        <div class="mt-2 text-[7px] font-mono flex justify-between opacity-50">
-          <span>${trk.genre}</span>
-          <span>${trk.bpm} BPM</span>
-        </div>
+        `}
 
         ${this.curationStatus ? `
-          <div class="absolute inset-0 flex items-center justify-center z-50 bg-[#050c05]/80">
+          <div class="absolute inset-0 flex items-center justify-center z-[100] bg-[#050c05]/80 pointer-events-none">
             <div class="stamp-animation border-4 border-[#8bac0f] px-4 py-2 bg-[#040a04] font-heading text-[12px] -rotate-12">
               ${this.curationStatus}
             </div>
+          </div>
+        ` : ''}
+        
+        ${trk.embedUrl ? `
+          <div class="absolute top-1 left-1 right-1 flex justify-between pointer-events-none z-40 text-[6px] font-retro opacity-30">
+             <span>[${this.playerIndex + 1}/${total}] THE FORGE</span>
+             <span>◀ DISLIKE / LIKE ▶</span>
           </div>
         ` : ''}
       </div>`
