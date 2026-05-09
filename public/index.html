@@ -14,11 +14,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/styles.css">
 </head>
-<body class="bg-[#020204] flex items-center justify-center min-h-screen overflow-hidden">
+<body class="bg-[#020204] overflow-hidden w-full h-full fixed inset-0">
   <div id="env-light" class="fixed inset-0 pointer-events-none bg-gradient-to-br from-white/5 via-transparent to-black/20 mix-blend-overlay z-50"></div>
-  <div class="relative perspective-1000 flex items-center justify-center w-full h-full">
-    <div id="gameboy-shell" class="relative w-[634px] h-[1155px] rounded-[82px] flex flex-col items-center p-14 overflow-visible">
-        <div class="plastic-grain absolute inset-0 rounded-[82px]"></div>
+  <div id="gameboy-shell" class="fixed left-1/2 top-1/2 w-[634px] h-[1155px] rounded-[82px] flex flex-col items-center p-14 overflow-visible perspective-1000" style="transform: translate(-50%, -50%) scale(var(--gb-scale, 1)) rotateX(var(--gb-rotate-x, 0deg)) rotateY(var(--gb-rotate-y, 0deg));">
+    <div class="plastic-grain absolute inset-0 rounded-[82px]"></div>
         
         <!-- Physical Screws -->
         <div class="screw-hole top-9 left-9"></div>
