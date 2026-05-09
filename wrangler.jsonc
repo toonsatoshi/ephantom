@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "ephantom-genesis-tnnfhnupzapkgk-0jxphc",
+  "name": "ephantom",
   "main": "worker/index.js",
   "compatibility_date": "2025-04-24",
   "assets": {
