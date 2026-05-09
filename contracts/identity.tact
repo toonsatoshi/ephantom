@@ -3,6 +3,7 @@ import "./cycle";
 
 contract Identity {
     master: Address;
+    owner: Address?;
     id: Int as uint32;
     name: String = "";
     seedParameters: String = "";
@@ -21,12 +22,13 @@ contract Identity {
         require(!self.initialized, "Already initialized");
         self.name = msg.name;
         self.seedParameters = msg.seedParameters;
+        self.owner = msg.owner;
         self.initialized = true;
     }
 
     receive(msg: ProposeCycle) {
-        // In a real scenario, we might want to restrict who can propose
-        // require(sender() == self.master || sender() == self.owner, "Unauthorized");
+        require(self.owner != null, "Identity not initialized");
+        require(sender() == self.owner!! || sender() == self.master, "Unauthorized: Only owner or master can propose");
         
         let init: StateInit = initOf Cycle(myAddress(), self.currentCycleId);
         let address: Address = contractAddress(init);
@@ -59,6 +61,20 @@ contract Identity {
         }
     }
 
+    receive(msg: CloseCycle) {
+        require(self.owner != null, "Identity not initialized");
+        require(sender() == self.owner!! || sender() == self.master, "Unauthorized");
+        let cycleAddress: Address? = self.cycles.get(msg.cycleId);
+        if (cycleAddress != null) {
+            send(SendParameters{
+                to: cycleAddress!!,
+                value: 0,
+                mode: SendRemainingValue,
+                body: "close".asComment()
+            });
+        }
+    }
+
     get fun details(): String {
         return self.name;
     }
@@ -77,5 +93,9 @@ contract Identity {
 
     get fun cycleAddress(cycleId: Int): Address? {
         return self.cycles.get(cycleId);
+    }
+
+    get fun owner(): Address? {
+        return self.owner;
     }
 }

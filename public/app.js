@@ -52,10 +52,13 @@ class EphantomOS {
   async fetchAll() {
     this.isLoading = true; this.render()
     try {
-      const urls = ['/api/cycle', '/api/tracks', '/api/entities', '/api/vault']
+      const address = this.wallet?.account?.address || 'anonymous'
+      const urls = ['/api/cycle', '/api/tracks', '/api/entities', `/api/vault?address=${address}`]
       const results = await Promise.all(urls.map(url => fetch(url).then(r => r.ok ? r.json() : Promise.reject(`HTTP ${r.status}`))))
       this.cycle = results[0]; this.tracks = results[1]; this.entities = results[2]; this.vault = results[3]
-      if (this.vault?.votes_this_cycle) this.vault.votes_this_cycle.forEach(id => this.votedIds.add(id))
+      if (this.vault?.votes_this_cycle) {
+        this.votedIds = new Set(this.vault.votes_this_cycle)
+      }
     } catch (err) {
       console.error("FETCH_ERROR:", err)
       this.errorMsg = "CONNECTION_LOST"
@@ -70,7 +73,7 @@ class EphantomOS {
         manifestUrl: window.location.origin + '/tonconnect-manifest.json',
         buttonRootId: null // We use our own UI
       });
-      this.tonConnect.onStatusChange(wallet => {
+      this.tonConnect.onStatusChange(async wallet => {
         this.wallet = wallet;
         if (wallet) {
           const addr = wallet.account.address;
@@ -78,6 +81,7 @@ class EphantomOS {
         } else {
           this.username = this.tg?.initDataUnsafe?.user?.username || 'GUEST_USER';
         }
+        await this.fetchAll();
         this.render();
       });
     }
@@ -262,8 +266,8 @@ class EphantomOS {
   _renderVault() {
     const v = this.vault || { reputation: 1000, royalties_pending: 0 };
     const pages = ['REPUTATION', 'ROYALTIES', 'ALIGNMENT'];
-    let body = `<div class="flex-1 flex flex-col items-center justify-center"><div class="bg-[#8bac0f] text-[#050c05] p-4 border-2 border-white/20 w-full text-center"><div class="text-[24px] font-heading">${v.reputation.toLocaleString()}</div><div class="text-[8px] font-retro mt-1">REP</div></div><div class="mt-4 text-[10px] font-mono opacity-60">PENDING: ${v.royalties_pending} ETH</div></div>`;
-    if (this.vaultPage === 1) body = `<div class="flex-1 flex flex-col justify-center text-center"><div class="text-[10px] font-retro opacity-50">PENDING</div><div class="text-[20px] font-heading">${v.royalties_pending} ETH</div></div>`;
+    let body = `<div class="flex-1 flex flex-col items-center justify-center"><div class="bg-[#8bac0f] text-[#050c05] p-4 border-2 border-white/20 w-full text-center"><div class="text-[24px] font-heading">${v.reputation.toLocaleString()}</div><div class="text-[8px] font-retro mt-1">REP</div></div><div class="mt-4 text-[10px] font-mono opacity-60">PENDING: ${v.royalties_pending} TON</div></div>`;
+    if (this.vaultPage === 1) body = `<div class="flex-1 flex flex-col justify-center text-center"><div class="text-[10px] font-retro opacity-50">PENDING</div><div class="text-[20px] font-heading">${v.royalties_pending} TON</div></div>`;
     this.viewContainer.innerHTML = `<div class="w-full h-full p-2 flex flex-col text-[#8bac0f] font-tech"><div class="text-[10px] font-retro border-b border-[#8bac0f]/20 pb-1 mb-2 flex justify-between"><span>THE VAULT</span><span>${pages[this.vaultPage]}</span></div>${body}</div>`
   }
 

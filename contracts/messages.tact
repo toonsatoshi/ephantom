@@ -27,6 +27,7 @@ message CreateIdentity {
 message InternalInitializeIdentity {
     name: String;
     seedParameters: String;
+    owner: Address;
 }
 
 message ProposeCycle {
@@ -58,4 +59,9 @@ message ForwardVote {
     identityId: Int as uint32;
     cycleId: Int as uint32;
     trackId: Int as uint32;
+}
+
+message CloseCycle {
+    identityId: Int as uint32;
+    cycleId: Int as uint32;
 }

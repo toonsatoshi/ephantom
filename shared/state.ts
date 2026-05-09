@@ -1,4 +1,4 @@
-export const createInitialState = (initialTracks = []) => ({
+export const createInitialState = (initialTracks: any[] = []) => ({
   cycle: {
     id: 1,
     phase: 'VOTING',
@@ -11,7 +11,7 @@ export const createInitialState = (initialTracks = []) => ({
     max_extensions: 3,
     quorum_met: false,
     rep_decay_rate: 5,
-    payout_threshold_sats: 1000,
+    payout_threshold_nanoton: 1000000000, // 1 TON in nanoTON
   },
   entities: [
     {
@@ -28,13 +28,16 @@ export const createInitialState = (initialTracks = []) => ({
     }
   ],
   tracks: initialTracks,
-  user: {
-    reputation: 100,
-    floor: 100,
-    votes_this_cycle: [],
-    role: 'NEW_USER',
-    royalties_pending: 0,
-    royalties_lifetime: 0,
-    alignment_history: [],
-  }
+  users: {} as Record<string, any>
+});
+
+export const createDefaultUser = (address: string) => ({
+  address,
+  reputation: 1000,
+  floor: 1000,
+  votes_this_cycle: [],
+  role: 'NEW_USER',
+  royalties_pending: 0,
+  royalties_lifetime: 0,
+  alignment_history: [],
 });

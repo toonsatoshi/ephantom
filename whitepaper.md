@@ -131,7 +131,7 @@ A TON smart contract stores for each cycle ID:
 · submission_start, submission_end
 · vote_start, vote_end
 · min_quorum (voters)
-· payout_threshold_sats (minimum accumulated royalties to trigger distribution)
+· payout_threshold_nanoton (minimum accumulated royalties to trigger distribution)
 · rep_decay_rate (default 5%)
 
 Mutability: Parameters for future cycles are changed by reputation-weighted vote (simple majority, minimum 10% turnout of eligible reputation users). No token governance in v1.

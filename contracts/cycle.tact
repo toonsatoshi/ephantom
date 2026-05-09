@@ -4,6 +4,7 @@ contract Cycle {
     identity: Address;
     id: Int as uint32;
     params: CycleParameters?;
+    closed: Bool = false;
     
     totalVotes: Int as int257 = 0;
     trackVotes: map<Int as uint32, Int as int257>; // trackId -> total reputation weight
@@ -22,10 +23,10 @@ contract Cycle {
     receive(msg: ForwardVote) {
         require(sender() == self.identity, "Only identity can route votes");
         require(self.params != null, "Cycle not initialized");
+        require(!self.closed, "Cycle is closed");
         
-        // In a real scenario, we would check the time:
-        // let p: CycleParameters = self.params!!;
-        // require(now() >= p.voteStart && now() <= p.voteEnd, "Not in voting window");
+        let p: CycleParameters = self.params!!;
+        require(now() >= p.voteStart && now() <= p.voteEnd, "Not in voting window");
         
         require(self.voted.get(msg.voter) == null, "Already voted");
         
@@ -38,6 +39,11 @@ contract Cycle {
             self.trackVotes.set(msg.trackId, currentTrackVotes!! + weight);
         }
         self.totalVotes = self.totalVotes + weight;
+    }
+
+    receive("close") {
+        require(sender() == self.identity, "Only identity can close");
+        self.closed = true;
     }
 
     get fun totalVotes(): Int {
@@ -58,5 +64,9 @@ contract Cycle {
             return false;
         }
         return v!!;
+    }
+
+    get fun closed(): Bool {
+        return self.closed;
     }
 }

@@ -91,12 +91,13 @@ describe('EphantomProtocol', () => {
         const identityContract = blockchain.openContract(Identity.fromAddress(identityAddress));
 
         // 2. Propose Cycle
+        const now = BigInt(Math.floor(Date.now() / 1000));
         const cycleParams = {
             $$type: 'CycleParameters' as const,
-            submissionStart: 0n,
-            submissionEnd: 100n,
-            voteStart: 0n,
-            voteEnd: 100n,
+            submissionStart: now,
+            submissionEnd: now + 1000n,
+            voteStart: now,
+            voteEnd: now + 1000n,
             minQuorum: 1n,
         };
 

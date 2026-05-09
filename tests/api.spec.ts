@@ -21,27 +21,29 @@ describe('EPHANTOM API Integration', () => {
   })
 
   it('should increment vote count', async () => {
+    const address = 'test-addr'
     const res = await app.request('/api/vote/1', {
       method: 'POST',
-      body: JSON.stringify({ address: 'test-addr' }),
+      body: JSON.stringify({ address }),
       headers: { 'Content-Type': 'application/json' }
     })
     const data = await res.json()
     expect(res.status).toBe(200)
     expect(data.ok).toBe(true)
     expect(data.track.votes).toBe(11)
-    expect(state.user.votes_this_cycle).toContain(1)
+    expect(state.users[address].votes_this_cycle).toContain(1)
   })
 
   it('should prevent double voting', async () => {
+    const address = 'test-addr'
     await app.request('/api/vote/1', {
       method: 'POST',
-      body: JSON.stringify({ address: 'test-addr' }),
+      body: JSON.stringify({ address }),
       headers: { 'Content-Type': 'application/json' }
     })
     const res = await app.request('/api/vote/1', {
       method: 'POST',
-      body: JSON.stringify({ address: 'test-addr' }),
+      body: JSON.stringify({ address }),
       headers: { 'Content-Type': 'application/json' }
     })
     expect(res.status).toBe(409)

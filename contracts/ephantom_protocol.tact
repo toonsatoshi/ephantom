@@ -37,7 +37,7 @@ contract EphantomProtocol {
             to: address,
             value: ton("0.1"),
             mode: SendIgnoreErrors,
-            body: InternalInitializeIdentity{name: msg.name, seedParameters: msg.seedParameters}.toCell(),
+            body: InternalInitializeIdentity{name: msg.name, seedParameters: msg.seedParameters, owner: sender()}.toCell(),
             code: init.code,
             data: init.data
         });
