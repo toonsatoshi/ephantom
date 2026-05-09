@@ -99,19 +99,18 @@ class EphantomOS {
       this.fetchAll() 
       this.updateScale()
       window.addEventListener('resize', () => this.updateScale())
+      if (window.visualViewport) window.visualViewport.addEventListener('resize', () => this.updateScale())
     } catch (err) {
       console.error("OS_INIT_ERROR:", err)
     }
   }
 
   updateScale() {
-    if (!this.shell) return
-    const padding = 20
-    const availableW = window.innerWidth - padding
-    const availableH = window.innerHeight - padding
-    const originalW = 634
-    const originalH = 1155
-    const scale = Math.min(availableW / originalW, availableH / originalH, 1.0)
+    const shell = document.getElementById('gameboy-shell')
+    if (!shell) return
+    const w = window.innerWidth
+    const h = window.innerHeight
+    const scale = Math.min(w / 634, h / 1155) * 0.98
     document.documentElement.style.setProperty('--gb-scale', scale)
   }
 
