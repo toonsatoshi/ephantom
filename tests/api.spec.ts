@@ -1,15 +1,18 @@
 import { createEphantomApp } from '../shared/api'
 import { createInitialState } from '../shared/state'
+import { InMemoryRepository } from '../shared/repository'
 
 describe('EPHANTOM API Integration', () => {
   let app: any
   let state: any
+  let repo: InMemoryRepository
 
   beforeEach(() => {
     state = createInitialState([
-      { id: 1, title: 'Track 1', votes: 10, url: 'url1', embedUrl: 'embed1' }
+      { id: 1, title: 'Track 1', votes: 10, url: 'url1', embedUrl: 'embed1', rep_weight: 1000 }
     ])
-    app = createEphantomApp(state)
+    repo = new InMemoryRepository(state)
+    app = createEphantomApp(repo)
   })
 
   it('should load tracks from API', async () => {
@@ -31,7 +34,9 @@ describe('EPHANTOM API Integration', () => {
     expect(res.status).toBe(200)
     expect(data.ok).toBe(true)
     expect(data.track.votes).toBe(11)
-    expect(state.users[address].votes_this_cycle).toContain(1)
+    
+    const user = await repo.getUser(address)
+    expect(user.votes_this_cycle).toContain(1)
   })
 
   it('should prevent double voting', async () => {
@@ -57,7 +62,7 @@ describe('EPHANTOM API Integration', () => {
     })
     const data = await res.json()
     expect(res.status).toBe(200)
-    expect(data.track.title).toBe('New Track')
+    expect(data.track.title).toBe('NEW TRACK') // Check capitalization logic
     expect(data.track.url).toBeDefined()
     expect(data.track.embedUrl).toBeDefined()
   })

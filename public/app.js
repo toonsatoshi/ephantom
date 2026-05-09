@@ -220,11 +220,19 @@ class EphantomOS {
   
   _renderMenu() {
     const cycle = this.cycle || {id:1, phase:'VOTING'};
-    this.viewContainer.innerHTML = `<div class="w-full p-2 text-[#8bac0f] font-tech"><div class="text-[7px] font-retro border-b-2 border-[#8bac0f]/20 mb-2 pb-1 flex justify-between items-center"><span>ROOT_SYS</span><span>CYC#${cycle.id}·${cycle.phase}</span></div><div class="space-y-1">${this.menuOptions.map((opt, i) => {
+    const batteryIcon = this.batteryLevel < 20 ? '🪫' : (this.batteryLevel < 60 ? '🔋' : '🔋');
+    this.viewContainer.innerHTML = `<div class="w-full p-2 text-[#8bac0f] font-tech"><div class="text-[7px] font-retro border-b-2 border-[#8bac0f]/20 mb-2 pb-1 flex justify-between items-center"><span>ROOT_SYS</span><span>${batteryIcon}${this.batteryLevel}% · CYC#${cycle.id}·${cycle.phase}</span></div><div class="space-y-1">${this.menuOptions.map((opt, i) => {
       let label = opt;
       if (opt === 'CONNECT WALLET' && this.wallet) label = 'DISCONNECT';
       return `<div class="px-2 py-1 text-[10px] font-heading flex justify-between items-center ${this.menuIndex === i ? 'selected' : ''}"><span>${label}</span>${this.menuIndex === i ? '<span class="text-[10px]">▶</span>' : ''}</div>`
     }).join('')}</div></div>`
+  }
+
+  sanitize(str) {
+    if (typeof str !== 'string') return str;
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
   }
 
   _renderMatrix() {
@@ -233,7 +241,7 @@ class EphantomOS {
     if (tracks.length === 0) return this._renderEmpty("NO TRACKS IN THE MATRIX")
     const trk = tracks[this.matrixIndex];
     if (!trk) return;
-    this.viewContainer.innerHTML = `<div class="w-full h-full p-2 flex flex-col text-[#8bac0f] relative font-tech"><div class="text-[10px] font-retro border-b border-[#8bac0f]/20 pb-1 mb-2">THE MATRIX</div><div class="matrix-card flex-1 flex flex-col p-2 bg-[#8bac0f]/5 relative"><div class="text-[12px] font-heading mb-2">${trk.title}</div><div class="text-[10px] font-mono opacity-60">${trk.ii_name}</div><div class="mt-auto text-[7px] font-mono flex justify-between opacity-70"><span>▲${trk.votes}</span></div></div><div class="mt-2 text-[10px] font-retro">${this.votedIds.has(trk.id) ? '✓ VOTE_CAST' : (this.wallet ? '<span class="animate-pulse">[A] VOTE</span>' : 'CONNECT WALLET TO VOTE')}</div>${this.matrixStatus ? `<div class="absolute inset-0 flex items-center justify-center z-10"><div class="stamp-animation border-4 border-[#8bac0f] px-3 py-2 bg-[#050c05] font-heading text-[10px] -rotate-12">${this.matrixStatus}</div></div>` : ''}</div>`
+    this.viewContainer.innerHTML = `<div class="w-full h-full p-2 flex flex-col text-[#8bac0f] relative font-tech"><div class="text-[10px] font-retro border-b border-[#8bac0f]/20 pb-1 mb-2">THE MATRIX</div><div class="matrix-card flex-1 flex flex-col p-2 bg-[#8bac0f]/5 relative"><div class="text-[12px] font-heading mb-2">${this.sanitize(trk.title)}</div><div class="text-[10px] font-mono opacity-60">${this.sanitize(trk.ii_name)}</div><div class="mt-auto text-[7px] font-mono flex justify-between opacity-70"><span>▲${trk.votes}</span></div></div><div class="mt-2 text-[10px] font-retro">${this.votedIds.has(trk.id) ? '✓ VOTE_CAST' : (this.wallet ? '<span class="animate-pulse">[A] VOTE</span>' : 'CONNECT WALLET TO VOTE')}</div>${this.matrixStatus ? `<div class="absolute inset-0 flex items-center justify-center z-10"><div class="stamp-animation border-4 border-[#8bac0f] px-3 py-2 bg-[#050c05] font-heading text-[10px] -rotate-12">${this.matrixStatus}</div></div>` : ''}</div>`
   }
 
   _renderPlayer() {
@@ -242,7 +250,7 @@ class EphantomOS {
     if (tracks.length === 0) return this._renderEmpty("THE FORGE IS COLD")
     const trk = tracks[this.playerIndex];
     if (!trk) return;
-    this.viewContainer.innerHTML = `<div class="w-full h-full p-0 flex flex-col text-[#8bac0f] font-tech relative overflow-hidden">${trk.embedUrl ? `<iframe src="${trk.embedUrl}" width="100%" height="100%" allow="encrypted-media" style="border: none; background: #000;"></iframe>` : `<div class="p-2 flex flex-col h-full"><div class="text-[14px] font-heading mb-1">${trk.title}</div><div class="text-[10px] font-mono opacity-60">${trk.ii_name}</div><div class="mt-auto bg-[#8bac0f] text-[#050c05] px-2 py-1 inline-block text-center font-retro">[A] PLAY</div></div>`}${this.curationStatus ? `<div class="absolute inset-0 flex items-center justify-center z-[100] bg-[#050c05]/80 pointer-events-none"><div class="stamp-animation border-4 border-[#8bac0f] px-4 py-2 bg-[#050c05] font-heading text-[12px] -rotate-12">${this.curationStatus}</div></div>` : ''}<div class="absolute top-1 left-1 right-1 flex justify-between pointer-events-none z-40 text-[6px] font-retro opacity-30"><span>[${this.playerIndex + 1}/${tracks.length}] THE FORGE</span><span>◀ DISLIKE / LIKE ▶</span></div></div>`
+    this.viewContainer.innerHTML = `<div class="w-full h-full p-0 flex flex-col text-[#8bac0f] font-tech relative overflow-hidden">${trk.embedUrl ? `<iframe src="${trk.embedUrl}" width="100%" height="100%" allow="encrypted-media" style="border: none; background: #000;"></iframe>` : `<div class="p-2 flex flex-col h-full"><div class="text-[14px] font-heading mb-1">${this.sanitize(trk.title)}</div><div class="text-[10px] font-mono opacity-60">${this.sanitize(trk.ii_name)}</div><div class="mt-auto bg-[#8bac0f] text-[#050c05] px-2 py-1 inline-block text-center font-retro">[A] PLAY</div></div>`}${this.curationStatus ? `<div class="absolute inset-0 flex items-center justify-center z-[100] bg-[#050c05]/80 pointer-events-none"><div class="stamp-animation border-4 border-[#8bac0f] px-4 py-2 bg-[#050c05] font-heading text-[12px] -rotate-12">${this.curationStatus}</div></div>` : ''}<div class="absolute top-1 left-1 right-1 flex justify-between pointer-events-none z-40 text-[6px] font-retro opacity-30"><span>[${this.playerIndex + 1}/${tracks.length}] THE FORGE</span><span>◀ DISLIKE / LIKE ▶</span></div></div>`
   }
 
   _renderLoading(msg) {
@@ -264,10 +272,19 @@ class EphantomOS {
   }
 
   _renderVault() {
-    const v = this.vault || { reputation: 1000, royalties_pending: 0 };
+    const v = this.vault || { reputation: 1000, royalties_pending: 0, alignment_history: [] };
     const pages = ['REPUTATION', 'ROYALTIES', 'ALIGNMENT'];
-    let body = `<div class="flex-1 flex flex-col items-center justify-center"><div class="bg-[#8bac0f] text-[#050c05] p-4 border-2 border-white/20 w-full text-center"><div class="text-[24px] font-heading">${v.reputation.toLocaleString()}</div><div class="text-[8px] font-retro mt-1">REP</div></div><div class="mt-4 text-[10px] font-mono opacity-60">PENDING: ${v.royalties_pending} TON</div></div>`;
-    if (this.vaultPage === 1) body = `<div class="flex-1 flex flex-col justify-center text-center"><div class="text-[10px] font-retro opacity-50">PENDING</div><div class="text-[20px] font-heading">${v.royalties_pending} TON</div></div>`;
+    let body = '';
+    
+    if (this.vaultPage === 0) {
+      body = `<div class="flex-1 flex flex-col items-center justify-center"><div class="bg-[#8bac0f] text-[#050c05] p-4 border-2 border-white/20 w-full text-center"><div class="text-[24px] font-heading">${v.reputation.toLocaleString()}</div><div class="text-[8px] font-retro mt-1">REP</div></div><div class="mt-4 text-[10px] font-mono opacity-60">PENDING: ${v.royalties_pending} TON</div></div>`;
+    } else if (this.vaultPage === 1) {
+      body = `<div class="flex-1 flex flex-col justify-center text-center"><div class="text-[10px] font-retro opacity-50">PENDING</div><div class="text-[20px] font-heading">${v.royalties_pending} TON</div><div class="mt-4 text-[8px] opacity-40">THRESHOLD: 1.0 TON</div></div>`;
+    } else {
+      const history = v.alignment_history || [];
+      body = `<div class="flex-1 flex flex-col p-1 overflow-y-auto"><div class="text-[8px] font-retro mb-2 opacity-50">VOTE_HISTORY</div><div class="space-y-1">${history.length ? history.map((h: any) => `<div class="text-[7px] border-l-2 border-[#8bac0f] pl-1">SYNCED_ID: ${h.trackId}</div>`).join('') : '<div class="text-[7px] opacity-30">NO_DATA_FOUND</div>'}</div></div>`;
+    }
+    
     this.viewContainer.innerHTML = `<div class="w-full h-full p-2 flex flex-col text-[#8bac0f] font-tech"><div class="text-[10px] font-retro border-b border-[#8bac0f]/20 pb-1 mb-2 flex justify-between"><span>THE VAULT</span><span>${pages[this.vaultPage]}</span></div>${body}</div>`
   }
 

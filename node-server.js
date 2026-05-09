@@ -3,6 +3,7 @@ import { serveStatic } from '@hono/node-server/serve-static'
 import fs from 'fs/promises'
 import { createEphantomApp } from './shared/api'
 import { createInitialState } from './shared/state'
+import { InMemoryRepository } from './shared/repository'
 
 const STATE_FILE = './data/state.json'
 const SAMPLE_TRACKS_FILE = './data/sample-tracks.json'
@@ -23,18 +24,19 @@ async function loadState() {
   }
 }
 
-const state = await loadState()
+const initialState = await loadState()
+const repo = new InMemoryRepository(initialState)
 
 const saveState = async () => {
   try {
-    await fs.writeFile(STATE_FILE, JSON.stringify(state, null, 2))
+    await fs.writeFile(STATE_FILE, JSON.stringify(repo.getState(), null, 2))
     console.log('State persisted to disk.')
   } catch (err) {
     console.error('Failed to save state:', err)
   }
 }
 
-const app = createEphantomApp(state, async (type, detail) => {
+const app = createEphantomApp(repo, async (type, detail) => {
   console.log(`Mutation: ${type}`, detail)
   await saveState()
 })
