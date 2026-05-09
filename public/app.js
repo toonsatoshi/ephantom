@@ -50,25 +50,48 @@ class EphantomOS {
   }
 
   async fetchAll() {
+    this.isLoading = true; this.render()
     try {
       const urls = ['/api/cycle', '/api/tracks', '/api/entities', '/api/vault']
       const results = await Promise.all(urls.map(url => fetch(url).then(r => r.ok ? r.json() : Promise.reject(`HTTP ${r.status}`))))
       this.cycle = results[0]; this.tracks = results[1]; this.entities = results[2]; this.vault = results[3]
       if (this.vault?.votes_this_cycle) this.vault.votes_this_cycle.forEach(id => this.votedIds.add(id))
-    } catch {
-      this.cycle = { id: 1, phase: 'VOTING' }
-      this.tracks = [
-        { id: 101, title: 'GREEN NEEDLE', ii_name: 'JADE KAY', genre: 'R&B', bpm: 95, votes: 12, embedUrl: 'https://audius.co/embed/track/jadekay/green-needle?flavor=card' },
-        { id: 102, title: 'SILICON_SOUL', ii_name: 'JADE KAY', genre: 'EXPERIMENTAL', bpm: 82, votes: 8, url: '#' }
-      ]
-      this.entities = [ { id: 'II-JADEKAY', name: 'JADE KAY', genre_cluster: 'R&B / RAP / EXPERIMENTAL', status: 'ACTIVE', video: '/jadekay.mp4', active_curators: 128, releases: 4 } ]
-      this.vault = { reputation: 1000, royalties_pending: 0.124, role: 'SENIOR_CURATOR' }
+    } catch (err) {
+      console.error("FETCH_ERROR:", err)
+      this.errorMsg = "CONNECTION_LOST"
+    } finally {
+      this.isLoading = false; this.render()
     }
-    if (this.isBooted) this.render()
   }
 
-  initTonConnect() { if (typeof TonConnectSDK !== 'undefined') { this.tonConnect = new TonConnectSDK.TonConnect({ manifestUrl: 'https://ephantom-protocol.pages.dev/tonconnect-manifest.json' }); this.tonConnect.onStatusChange(wallet => { this.wallet = wallet; this.render() }) } }
-  
+  initTonConnect() {
+    if (typeof TON_CONNECT_UI !== 'undefined') {
+      this.tonConnect = new TON_CONNECT_UI.TonConnectUI({
+        manifestUrl: window.location.origin + '/tonconnect-manifest.json',
+        buttonRootId: null // We use our own UI
+      });
+      this.tonConnect.onStatusChange(wallet => {
+        this.wallet = wallet;
+        if (wallet) {
+          const addr = wallet.account.address;
+          this.username = addr.slice(0, 6) + '...' + addr.slice(-4);
+        } else {
+          this.username = this.tg?.initDataUnsafe?.user?.username || 'GUEST_USER';
+        }
+        this.render();
+      });
+    }
+  }
+
+  async connectWallet() {
+    if (!this.tonConnect) return;
+    if (this.wallet) {
+      await this.tonConnect.disconnect();
+    } else {
+      await this.tonConnect.openModal();
+    }
+  }
+
   bootSequence() {
     if (this.bootLock) return; this.bootLock = true
     setTimeout(() => { this.powerLed.classList.add('flicker'); setTimeout(() => { this.powerLed.classList.remove('flicker'); this.powerLed.classList.add('on'); if (this.ledGlow) this.ledGlow.style.opacity = '1'; if (this.bezelGlow) this.bezelGlow.style.opacity = '1'; this.startIntro() }, 800) }, 600)
@@ -107,7 +130,13 @@ class EphantomOS {
       if (action === 'down') this.menuIndex = (this.menuIndex + 1) % this.menuOptions.length;
       if (action === 'a') {
         const opt = this.menuOptions[this.menuIndex]
-        if (opt === 'TRIBUTE GATE') { this.openTribute() } else { this.currentState = opt }
+        if (opt === 'TRIBUTE GATE') {
+          this.openTribute()
+        } else if (opt === 'CONNECT WALLET') {
+          this.connectWallet()
+        } else {
+          this.currentState = opt
+        }
       }
     }
     else { if (action === 'b') { this.currentState = 'MENU'; this._stopAudio() } else this.routeInputToView(action) }
@@ -130,7 +159,41 @@ class EphantomOS {
   _loadTrack() { const trk = this.tracks[this.playerIndex]; if (trk?.url && trk.url !== '#') { this.audioElement.src = trk.url; if (this.isPlaying) this.audioElement.play().catch(() => {}) } }
   
   _matrixInput(a) { if (a === 'left') this.matrixIndex = (this.matrixIndex - 1 + this.tracks.length) % this.tracks.length; if (a === 'right') this.matrixIndex = (this.matrixIndex + 1) % this.tracks.length; if (a === 'a') this._castVote() }
-  async _castVote() { const trk = this.tracks[this.matrixIndex]; if (!trk || this.votedIds.has(trk.id)) return; this.votedIds.add(trk.id); this.matrixStatus = 'SYNCED'; this.beep(1100, 0.2); setTimeout(()=> {this.matrixStatus=null; this.render()}, 1100); this.render() }
+  async _castVote() {
+    const trk = this.tracks[this.matrixIndex];
+    if (!trk || this.votedIds.has(trk.id)) return;
+
+    try {
+      const resp = await fetch(`/api/vote/${trk.id}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          address: this.wallet?.account?.address || 'anonymous'
+        })
+      });
+
+      if (resp.ok) {
+        const data = await resp.json();
+        this.votedIds.add(trk.id);
+        this.matrixStatus = 'SYNCED';
+        this.beep(1100, 0.2);
+        // Refresh local data
+        await this.fetchAll();
+      } else {
+        const err = await resp.json();
+        console.error("VOTE_ERROR:", err.error);
+        this.matrixStatus = err.error || 'ERROR';
+        this.beep(220, 0.3);
+      }
+    } catch (err) {
+      console.error("VOTE_FETCH_FAILED:", err);
+      this.matrixStatus = 'OFFLINE';
+      this.beep(220, 0.3);
+    }
+
+    setTimeout(() => { this.matrixStatus = null; this.render() }, 1500);
+    this.render();
+  }
   
   _rosterInput(a) { if (a === 'left') this.rosterIndex = (this.rosterIndex - 1 + this.entities.length) % this.entities.length; if (a === 'right') this.rosterIndex = (this.rosterIndex + 1) % this.entities.length }
   _vaultInput(a) { if (a === 'left') this.vaultPage = Math.max(0, this.vaultPage - 1); if (a === 'right') this.vaultPage = Math.min(2, this.vaultPage + 1) }
@@ -142,6 +205,7 @@ class EphantomOS {
       case 'INTRO': this._renderIntro(); break; case 'SPLASH': this._renderSplash(); break; case 'MENU': this._renderMenu(); break
       case 'THE MATRIX': this._renderMatrix(); break; case 'THE FORGE': this._renderPlayer(); break; case 'ENTITIES': this._renderRoster(); break
       case 'DAO ROSTER': this._renderDaoRoster(); break; case 'THE VAULT': this._renderVault(); break; case 'SYSTEM OVERVIEW': this._renderSlides(); break
+      case 'CONNECT WALLET': this._renderMenu(); break // Stay on menu
       default: this._renderSplash(); break
     }
   }
@@ -152,19 +216,37 @@ class EphantomOS {
   
   _renderMenu() {
     const cycle = this.cycle || {id:1, phase:'VOTING'};
-    this.viewContainer.innerHTML = `<div class="w-full p-2 text-[#8bac0f] font-tech"><div class="text-[7px] font-retro border-b-2 border-[#8bac0f]/20 mb-2 pb-1 flex justify-between items-center"><span>ROOT_SYS</span><span>CYC#${cycle.id}·${cycle.phase}</span></div><div class="space-y-1">${this.menuOptions.map((opt, i) => `<div class="px-2 py-1 text-[10px] font-heading flex justify-between items-center ${this.menuIndex === i ? 'selected' : ''}"><span>${opt}</span>${this.menuIndex === i ? '<span class="text-[10px]">▶</span>' : ''}</div>`).join('')}</div></div>`
+    this.viewContainer.innerHTML = `<div class="w-full p-2 text-[#8bac0f] font-tech"><div class="text-[7px] font-retro border-b-2 border-[#8bac0f]/20 mb-2 pb-1 flex justify-between items-center"><span>ROOT_SYS</span><span>CYC#${cycle.id}·${cycle.phase}</span></div><div class="space-y-1">${this.menuOptions.map((opt, i) => {
+      let label = opt;
+      if (opt === 'CONNECT WALLET' && this.wallet) label = 'DISCONNECT';
+      return `<div class="px-2 py-1 text-[10px] font-heading flex justify-between items-center ${this.menuIndex === i ? 'selected' : ''}"><span>${label}</span>${this.menuIndex === i ? '<span class="text-[10px]">▶</span>' : ''}</div>`
+    }).join('')}</div></div>`
   }
 
   _renderMatrix() {
-    const tracks = this.tracks.length ? this.tracks : []; const trk = tracks[this.matrixIndex];
+    const tracks = this.tracks.length ? this.tracks : [];
+    if (this.isLoading) return this._renderLoading("SYNCING_MATRIX...")
+    if (tracks.length === 0) return this._renderEmpty("NO TRACKS IN THE MATRIX")
+    const trk = tracks[this.matrixIndex];
     if (!trk) return;
-    this.viewContainer.innerHTML = `<div class="w-full h-full p-2 flex flex-col text-[#8bac0f] relative font-tech"><div class="text-[10px] font-retro border-b border-[#8bac0f]/20 pb-1 mb-2">THE MATRIX</div><div class="matrix-card flex-1 flex flex-col p-2 bg-[#8bac0f]/5 relative"><div class="text-[12px] font-heading mb-2">${trk.title}</div><div class="text-[10px] font-mono opacity-60">${trk.ii_name}</div><div class="mt-auto text-[7px] font-mono flex justify-between opacity-70"><span>▲${trk.votes}</span></div></div><div class="mt-2 text-[10px] font-retro">${this.votedIds.has(trk.id) ? '✓ VOTE_CAST' : '<span class="animate-pulse">[A] VOTE</span>'}</div>${this.matrixStatus ? `<div class="absolute inset-0 flex items-center justify-center z-10"><div class="stamp-animation border-4 border-[#8bac0f] px-3 py-2 bg-[#050c05] font-heading text-[10px] -rotate-12">${this.matrixStatus}</div></div>` : ''}</div>`
+    this.viewContainer.innerHTML = `<div class="w-full h-full p-2 flex flex-col text-[#8bac0f] relative font-tech"><div class="text-[10px] font-retro border-b border-[#8bac0f]/20 pb-1 mb-2">THE MATRIX</div><div class="matrix-card flex-1 flex flex-col p-2 bg-[#8bac0f]/5 relative"><div class="text-[12px] font-heading mb-2">${trk.title}</div><div class="text-[10px] font-mono opacity-60">${trk.ii_name}</div><div class="mt-auto text-[7px] font-mono flex justify-between opacity-70"><span>▲${trk.votes}</span></div></div><div class="mt-2 text-[10px] font-retro">${this.votedIds.has(trk.id) ? '✓ VOTE_CAST' : (this.wallet ? '<span class="animate-pulse">[A] VOTE</span>' : 'CONNECT WALLET TO VOTE')}</div>${this.matrixStatus ? `<div class="absolute inset-0 flex items-center justify-center z-10"><div class="stamp-animation border-4 border-[#8bac0f] px-3 py-2 bg-[#050c05] font-heading text-[10px] -rotate-12">${this.matrixStatus}</div></div>` : ''}</div>`
   }
 
   _renderPlayer() {
-    const tracks = this.tracks.length ? this.tracks : []; const trk = tracks[this.playerIndex];
+    const tracks = this.tracks.length ? this.tracks : [];
+    if (this.isLoading) return this._renderLoading("FORGING_SIGNAL...")
+    if (tracks.length === 0) return this._renderEmpty("THE FORGE IS COLD")
+    const trk = tracks[this.playerIndex];
     if (!trk) return;
     this.viewContainer.innerHTML = `<div class="w-full h-full p-0 flex flex-col text-[#8bac0f] font-tech relative overflow-hidden">${trk.embedUrl ? `<iframe src="${trk.embedUrl}" width="100%" height="100%" allow="encrypted-media" style="border: none; background: #000;"></iframe>` : `<div class="p-2 flex flex-col h-full"><div class="text-[14px] font-heading mb-1">${trk.title}</div><div class="text-[10px] font-mono opacity-60">${trk.ii_name}</div><div class="mt-auto bg-[#8bac0f] text-[#050c05] px-2 py-1 inline-block text-center font-retro">[A] PLAY</div></div>`}${this.curationStatus ? `<div class="absolute inset-0 flex items-center justify-center z-[100] bg-[#050c05]/80 pointer-events-none"><div class="stamp-animation border-4 border-[#8bac0f] px-4 py-2 bg-[#050c05] font-heading text-[12px] -rotate-12">${this.curationStatus}</div></div>` : ''}<div class="absolute top-1 left-1 right-1 flex justify-between pointer-events-none z-40 text-[6px] font-retro opacity-30"><span>[${this.playerIndex + 1}/${tracks.length}] THE FORGE</span><span>◀ DISLIKE / LIKE ▶</span></div></div>`
+  }
+
+  _renderLoading(msg) {
+    this.viewContainer.innerHTML = `<div class="flex flex-col items-center justify-center h-full text-[#8bac0f] animate-pulse"><div class="text-[10px] font-retro">${msg}</div></div>`
+  }
+
+  _renderEmpty(msg) {
+    this.viewContainer.innerHTML = `<div class="flex flex-col items-center justify-center h-full text-[#8bac0f] opacity-50"><div class="text-[10px] font-retro">${msg}</div></div>`
   }
 
   _renderRoster() {

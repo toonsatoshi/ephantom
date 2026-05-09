@@ -4,14 +4,16 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "bun scripts/dev.ts",
-    "build": "wrangler build",
+    "dev": "npx tsx node-server.js",
+    "build": "tact --config tact.config.json",
+    "test": "npm run build && jest",
     "deploy": "wrangler deploy",
     "lint": "eslint --cache -f json --quiet .",
     "prepare": "bun .bootstrap.js || true"
   },
   "dependencies": {
     "@hono/node-server": "^2.0.1",
+    "@tonconnect/ui": "^2.4.4",
     "hono": "^4.9.8",
     "jimp": "^1.6.1"
   },
