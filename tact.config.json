@@ -1,0 +1,9 @@
+{
+    "projects": [
+        {
+            "name": "ephantom_protocol",
+            "path": "./contracts/ephantom_protocol.tact",
+            "output": "./build/ephantom_protocol"
+        }
+    ]
+}
