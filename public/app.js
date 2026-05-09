@@ -111,9 +111,27 @@ class EphantomOS {
       this.initBatteryAPI()
       this.bootSequence()
       this.fetchAll() 
+      
+      this.updateScale()
+      window.addEventListener('resize', () => this.updateScale())
     } catch (err) {
       console.error("OS_INIT_ERROR:", err)
     }
+  }
+
+  updateScale() {
+    if (!this.shell) return
+    const padding = 20
+    const availableW = window.innerWidth - padding
+    const availableH = window.innerHeight - padding
+    const originalW = 634
+    const originalH = 1155
+    
+    const scaleW = availableW / originalW
+    const scaleH = availableH / originalH
+    const scale = Math.min(scaleW, scaleH, 1.0)
+    
+    document.documentElement.style.setProperty('--gb-scale', scale)
   }
 
   async fetchAll() {
@@ -718,7 +736,7 @@ class EphantomOS {
 
   updateOpticalShift(x, y) {
     if (this.reflection) this.reflection.style.transform = `skewX(-15deg) translate(${x}px, ${y}px) scale(2)`
-    if (this.shell && !this.inputThrottle) this.shell.style.transform = `rotateY(${x * 0.1}deg) rotateX(${-y * 0.1}deg)`
+    if (this.shell && !this.inputThrottle) this.shell.style.transform = `scale(var(--gb-scale)) rotateY(${x * 0.1}deg) rotateX(${-y * 0.1}deg)`
   }
 
   initAudio() {
@@ -740,9 +758,9 @@ class EphantomOS {
     this.screen.classList.remove('shake'); void this.screen.offsetWidth; this.screen.classList.add('shake')
     let tX = 0, tY = 0
     if (action === 'up') tX = 0.5; if (action === 'down') tX = -0.5; if (action === 'left') tY = -0.5; if (action === 'right') tY = 0.5; if (action === 'a' || action === 'b') tY = 0.3
-    this.shell.style.transform = `rotateX(${tX}deg) rotateY(${tY}deg)`
+    this.shell.style.transform = `scale(var(--gb-scale)) rotateX(${tX}deg) rotateY(${tY}deg)`
     if (['up','down','left','right'].includes(action)) this.dpadContainer.style.transform = `translate(${tY * 1.0}px, ${-tX * 1.0}px)`
-    requestAnimationFrame(() => setTimeout(() => { this.shell.style.transform = ''; this.dpadContainer.style.transform = '' }, 150))
+    requestAnimationFrame(() => setTimeout(() => { this.shell.style.transform = 'scale(var(--gb-scale))'; this.dpadContainer.style.transform = '' }, 150))
   }
 }
 
