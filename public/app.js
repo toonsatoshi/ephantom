@@ -168,8 +168,8 @@ class EphantomOS {
   }
   _stubTracks() {
     return [
-      { id: 101, title: 'GREEN NEEDLE', ii_name: 'JADE KAY', architect: 'usr_ALPHA', genre: 'NEO-SOUL', bpm: 95, votes: 12, rep_weight: 12400, embedUrl: 'https://audius.co/embed/track/jadekay/green-needle?flavor=card' },
-      { id: 102, title: 'SILICON_SOUL', ii_name: 'JADE KAY', architect: 'usr_BETA', genre: 'AMBIENT', bpm: 82, votes: 8, rep_weight: 8900 }
+      { id: 101, title: 'GREEN NEEDLE', ii_name: 'JADE KAY', architect: 'usr_ALPHA', genre: 'R&B', bpm: 95, votes: 12, rep_weight: 12400, embedUrl: 'https://audius.co/embed/track/jadekay/green-needle?flavor=card' },
+      { id: 102, title: 'SILICON_SOUL', ii_name: 'JADE KAY', architect: 'usr_BETA', genre: 'EXPERIMENTAL', bpm: 82, votes: 8, rep_weight: 8900 }
     ]
   }
   _stubEntities() {
@@ -177,7 +177,7 @@ class EphantomOS {
       {
         id: 'II-JADEKAY',
         name: 'JADE KAY',
-        genre_cluster: 'NEO-SOUL / GLITCH / AMBIENT',
+        genre_cluster: 'R&B / RAP / EXPERIMENTAL',
         bpm_range: [80, 110],
         lyrical_seeds: ['EPHANTOM', 'CYBERNETIC', 'REBIRTH'],
         releases: 4,

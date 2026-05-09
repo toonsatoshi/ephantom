@@ -28,7 +28,7 @@ const entities = [
   {
     id: 'II-JADEKAY',
     name: 'JADE KAY',
-    genre_cluster: 'NEO-SOUL / GLITCH / AMBIENT',
+    genre_cluster: 'R&B / RAP / EXPERIMENTAL',
     bpm_range: [80, 110],
     lyrical_seeds: ['EPHANTOM', 'CYBERNETIC', 'REBIRTH'],
     releases: 0,
